@@ -1,6 +1,8 @@
+import Tetris from "./components/Tetris";
+
 const App = () => {
     return <div>
-        <h1>Hello World</h1>
+        <Tetris></Tetris>
     </div>
 }
 

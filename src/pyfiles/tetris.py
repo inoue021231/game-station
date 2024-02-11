@@ -9,14 +9,20 @@ import pygame
 from pygame.locals import *
 from PIL import Image, ImageTk
 
+###
 FIELD_WIDTH = 12
+###
 FIELD_HEIGHT = 21
+###
 BLOCK_SIZE = 15
+###
 X0 = 235
+###
 Y0 = 220
 MAX_HP = [3, 5, 7, 12, 10, 15]
 ATTACK_COUNT = [7, 5, 4, 3, 5, 2]
 
+###
 MINO = [
     # Imino
     [
@@ -68,6 +74,8 @@ MINO = [
         [[0, 0], [1, 0], [1, 1], [1, 2]],
     ],
 ]
+
+###
 COLOR = [
     "dark gray",
     "black",
@@ -604,6 +612,7 @@ class Game:
         else:
             self.at_count -= 1
 
+    ###
     def new_mino(self, idx):
         self.x = 4
         self.y = 0
@@ -613,10 +622,12 @@ class Game:
             self.next()
         else:
             self.mino_idx = idx
+            # ?
         self.col_idx = self.mino_idx + 2
         if self.hold_flag != 0:
             self.attack()
 
+    ###
     def next(self):
         count = 0
         for i in range(3):
@@ -643,12 +654,14 @@ class Game:
             if count == FIELD_WIDTH:
                 del self.mino_status[y]
                 self.mino_status.insert(0, [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1])
+                # やる
                 line_cnt += 1
                 if self.skill_count > 0:
                     self.skill_count -= 1
+            # やる
             if self.mino_status[y] != [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]:
                 perfect_flag = False
-
+        # やる
         if perfect_flag:
             self.hp -= 10
             self.btb_flag = False
@@ -706,6 +719,7 @@ class Game:
         if line_cnt >= 1:
             self.sound.damage_sound.play()
 
+    ###
     def set_random_mino(self, idx):
         count = 0
 
@@ -724,6 +738,7 @@ class Game:
 
         return idx
 
+    ###
     def down_check(self, idx):
         dy = self.y + 1
         if self.can_move(self.x, dy, self.rot_status):
@@ -748,6 +763,7 @@ class Game:
             self.hold_flag = 0
             self.new_mino(tmp)
 
+    ###
     def can_move(self, x, y, rot):
         m = MINO[self.mino_idx][rot]
         for i in range(4):
@@ -851,37 +867,37 @@ class Game:
 class Field:
     def __init__(self, canvas):
         self.canvas = canvas
-        chara1_pre_img = Image.open("./data/yusha.png")
+        chara1_pre_img = Image.open("./src/pyfiles/data/yusha.png")
         chara1_pre_img = chara1_pre_img.resize((70, 70))
         chara1_pre_icon_img = chara1_pre_img.resize((50, 50))
         self.chara1_icon_img = ImageTk.PhotoImage(chara1_pre_icon_img)
         self.chara1_img = ImageTk.PhotoImage(chara1_pre_img)
-        chara2_pre_img = Image.open("./data/senshi.png")
+        chara2_pre_img = Image.open("./src/pyfiles/data/senshi.png")
         chara2_pre_img = chara2_pre_img.resize((70, 70))
         chara2_pre_icon_img = chara2_pre_img.resize((50, 50))
         self.chara2_icon_img = ImageTk.PhotoImage(chara2_pre_icon_img)
         self.chara2_img = ImageTk.PhotoImage(chara2_pre_img)
-        chara3_pre_img = Image.open("./data/mahotsukai.png")
+        chara3_pre_img = Image.open("./src/pyfiles/data/mahotsukai.png")
         chara3_pre_img = chara3_pre_img.resize((70, 70))
         chara3_pre_icon_img = chara3_pre_img.resize((50, 50))
         self.chara3_icon_img = ImageTk.PhotoImage(chara3_pre_icon_img)
         self.chara3_img = ImageTk.PhotoImage(chara3_pre_img)
-        easy_pre_img = Image.open("./data/slime.png")
+        easy_pre_img = Image.open("./src/pyfiles/data/slime.png")
         easy_pre_img = easy_pre_img.resize((70, 70))
         self.easy_img = ImageTk.PhotoImage(easy_pre_img)
-        normal_pre_img = Image.open("./data/mummy.png")
+        normal_pre_img = Image.open("./src/pyfiles/data/mummy.png")
         normal_pre_img = normal_pre_img.resize((70, 70))
         self.normal_img = ImageTk.PhotoImage(normal_pre_img)
-        hard_pre_img = Image.open("./data/devil.png")
+        hard_pre_img = Image.open("./src/pyfiles/data/devil.png")
         hard_pre_img = hard_pre_img.resize((70, 70))
         self.hard_img = ImageTk.PhotoImage(hard_pre_img)
-        expert_pre_img = Image.open("./data/shinigami.png")
+        expert_pre_img = Image.open("./src/pyfiles/data/shinigami.png")
         expert_pre_img = expert_pre_img.resize((70, 70))
         self.expert_img = ImageTk.PhotoImage(expert_pre_img)
-        secret1_pre_img = Image.open("./data/mao.png")
+        secret1_pre_img = Image.open("./src/pyfiles/data/mao.png")
         secret1_pre_img = secret1_pre_img.resize((70, 70))
         self.secret1_img = ImageTk.PhotoImage(secret1_pre_img)
-        secret2_pre_img = Image.open("./data/dragon.png")
+        secret2_pre_img = Image.open("./src/pyfiles/data/dragon.png")
         secret2_pre_img = secret2_pre_img.resize((140, 120))
         self.secret2_img = ImageTk.PhotoImage(secret2_pre_img)
         self.description_flag = False
@@ -1016,6 +1032,7 @@ class Field:
             fill="white",
         )
 
+    ###
     def draw_field(self, mino_status):
         for y in range(FIELD_HEIGHT):
             for x in range(FIELD_WIDTH):
@@ -1033,6 +1050,7 @@ class Field:
                     fill=COLOR[mino_status[y][x]],
                 )
 
+    ###
     def draw_forecast(self, x, dy, rot_status, mino_idx, col_idx):
         m = MINO[mino_idx][rot_status]
         col = COLOR[col_idx]
@@ -1045,6 +1063,7 @@ class Field:
                 x1, y1, x2, y2, outline=col, width=1, fill="dark gray"
             )
 
+    ###
     def draw_mino(self, x, y, rot_status, mino_idx, col_idx):
         m = MINO[mino_idx][rot_status]
         col = COLOR[col_idx]
@@ -1066,6 +1085,7 @@ class Field:
             )
             hp_x += bar
 
+    ###
     def draw_hold(self, hold_idx):
         x = 3
         y = 3
@@ -1090,6 +1110,7 @@ class Field:
                     x1, y1, x2, y2, outline="white", width=1, fill=col
                 )
 
+    ###
     def draw_next(self, next_mino):
         x = 1.5
         y = 2.5
@@ -1303,22 +1324,22 @@ class Field:
 class Sound:
     def __init__(self):
         pygame.mixer.init()
-        self.menu_bgm = pygame.mixer.Sound("./data/menu.mp3")
-        self.easy_bgm = pygame.mixer.Sound("./data/easy.mp3")
-        self.normal_bgm = pygame.mixer.Sound("./data/normal.mp3")
-        self.hard_bgm = pygame.mixer.Sound("./data/hard.mp3")
-        self.expert_bgm = pygame.mixer.Sound("./data/expert.mp3")
-        self.secret1_bgm = pygame.mixer.Sound("./data/secret1.mp3")
-        self.secret2_bgm = pygame.mixer.Sound("./data/secret2.mp3")
-        self.select_sound = pygame.mixer.Sound("./data/select.mp3")
-        self.cancel_sound = pygame.mixer.Sound("./data/cancel.mp3")
-        self.move_sound = pygame.mixer.Sound("./data/move.mp3")
-        self.tspin_sound = pygame.mixer.Sound("./data/tspin.mp3")
-        self.hold_sound = pygame.mixer.Sound("./data/hold.mp3")
-        self.damage_sound = pygame.mixer.Sound("./data/damage.mp3")
-        self.up_sound = pygame.mixer.Sound("./data/up.mp3")
-        self.skill_sound = pygame.mixer.Sound("./data/skill.mp3")
-        self.tspin_sound = pygame.mixer.Sound("./data/tspin.mp3")
+        self.menu_bgm = pygame.mixer.Sound("./src/pyfiles/data/menu.mp3")
+        self.easy_bgm = pygame.mixer.Sound("./src/pyfiles/data/easy.mp3")
+        self.normal_bgm = pygame.mixer.Sound("./src/pyfiles/data/normal.mp3")
+        self.hard_bgm = pygame.mixer.Sound("./src/pyfiles/data/hard.mp3")
+        self.expert_bgm = pygame.mixer.Sound("./src/pyfiles/data/expert.mp3")
+        self.secret1_bgm = pygame.mixer.Sound("./src/pyfiles/data/secret1.mp3")
+        self.secret2_bgm = pygame.mixer.Sound("./src/pyfiles/data/secret2.mp3")
+        self.select_sound = pygame.mixer.Sound("./src/pyfiles/data/select.mp3")
+        self.cancel_sound = pygame.mixer.Sound("./src/pyfiles/data/cancel.mp3")
+        self.move_sound = pygame.mixer.Sound("./src/pyfiles/data/move.mp3")
+        self.tspin_sound = pygame.mixer.Sound("./src/pyfiles/data/tspin.mp3")
+        self.hold_sound = pygame.mixer.Sound("./src/pyfiles/data/hold.mp3")
+        self.damage_sound = pygame.mixer.Sound("./src/pyfiles/data/damage.mp3")
+        self.up_sound = pygame.mixer.Sound("./src/pyfiles/data/up.mp3")
+        self.skill_sound = pygame.mixer.Sound("./src/pyfiles/data/skill.mp3")
+        self.tspin_sound = pygame.mixer.Sound("./src/pyfiles/data/tspin.mp3")
 
     def menu(self, play):
         if play:
