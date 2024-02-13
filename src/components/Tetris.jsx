@@ -4,8 +4,11 @@ const Tetris = () => {
   const FIELD_WIDTH = 12;
   const FIELD_HEIGHT = 21;
   const BLOCK_SIZE = 15;
-  const X0 = 235;
-  const Y0 = 220;
+  const X0 = 210;
+  const Y0 = 240;
+
+  const MAX_HP = [3, 5, 7, 12, 10, 15];
+  const ATTACK_COUNT = [7, 5, 4, 3, 5, 2];
 
   const MINO = [
     // Imino
@@ -239,23 +242,27 @@ const Tetris = () => {
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   ]);
 
-  const [timer, setTimer] = useState(false);
+  const [timer, setTimer] = useState(0);
 
   const [x, setX] = useState(4);
   const [y, setY] = useState(0);
   const [rotStatus, setRotStatus] = useState(0);
+  const [selectLevel, setSelectLevel] = useState(0);
+  const [hp, setHp] = useState(MAX_HP[selectLevel]);
+  const [atCount, setAtCount] = useState(ATTACK_COUNT[selectLevel]);
   const [minoIdx, setMinoIdx] = useState(0);
   const [holdIdx, setHoldIdx] = useState(-1);
   const [nextMino, setNextMino] = useState([-1, -1, -1]);
   const [prevMino, setPrevMino] = useState([0, 0, 0, 0, 0, 0, 0]);
 
-  const [gameStatus, setGameStatus] = useState(2);
+  const [gameStatus, setGameStatus] = useState(0);
 
   const [gameOverFlag, setGameOverFlag] = useState(false);
+  const [gameClearFlag, setGameClearFlag] = useState(false);
   const [gameReadyFlag, setGameReadyFlag] = useState(false);
   const [holdFlag, setHoldFlag] = useState(true);
-  const [canUpFlag, setCanUpFlag] = useState(true);
   const [tspinFlag, setTspinFlag] = useState(false);
+  const [secretFlag, setSecretFlag] = useState(true);
 
   const canMove = (dx, dy, rot) => {
     const mino = MINO[minoIdx][rot];
@@ -298,10 +305,8 @@ const Tetris = () => {
           while (canMove(x, dy, rotStatus)) {
             dy++;
           }
-          downCheck(1);
+          downCheck();
           dy--;
-
-          setCanUpFlag(true);
         } else if (k === 40) {
           dy++;
         } else if (k === 65) {
@@ -314,6 +319,9 @@ const Tetris = () => {
           if (holdFlag) {
             // hold.sound()
             hold();
+            dx = 4;
+            dy = 0;
+            rot = 0;
           }
         }
       }
@@ -350,25 +358,6 @@ const Tetris = () => {
       newMinoStatus[y + m[1]][x + m[0]] = minoIdx + 2;
     });
     setMinoStatus(newMinoStatus);
-  };
-
-  const setupRandomMino = () => {
-    const count = prevMino.filter((item) => item === 1).length;
-    let newPrevMino = [...prevMino];
-    if (count === 7) {
-      newPrevMino = [0, 0, 0, 0, 0, 0, 0];
-    }
-
-    while (true) {
-      const randomIndex = Math.floor(Math.random() * 7);
-      if (newPrevMino[randomIndex] === 0) {
-        newPrevMino[randomIndex] = 1;
-        break;
-      }
-    }
-
-    setPrevMino(newPrevMino);
-    return;
   };
 
   const next = () => {
@@ -446,15 +435,13 @@ const Tetris = () => {
   };
 
   // index = 1 急降下、 index = 0 降下中
-  const downCheck = (index) => {
+  const downCheck = () => {
     if (canMove(x, y + 1, rotStatus)) {
       setY((prevY) => prevY + 1);
     } else {
       setHoldFlag(true);
       setTspinFlag(false);
-      if (index === 1) {
-        setCanUpFlag(false);
-      }
+
       setupField();
       deleteLine();
       newMino(-1);
@@ -467,7 +454,18 @@ const Tetris = () => {
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      downCheck(0);
+      if (hp <= 0) {
+        if (secretFlag && selectLevel === 4) {
+          // secret第二スタート
+        } else {
+          //ゲームクリア
+          setGameClearFlag(true);
+        }
+      } else if (canMove(x, y, rotStatus)) {
+        downCheck();
+      } else {
+        setGameOverFlag(true);
+      }
     }, 1000);
 
     return () => {
@@ -488,7 +486,7 @@ const Tetris = () => {
                 y={y1}
                 width={BLOCK_SIZE}
                 height={BLOCK_SIZE}
-                fill={COLOR[m]}
+                fill={!gameOverFlag || m <= 1 ? COLOR[m] : "black"}
                 stroke="white"
                 key={`field${y}-${x}`}
               ></rect>
@@ -514,7 +512,7 @@ const Tetris = () => {
               width={BLOCK_SIZE}
               height={BLOCK_SIZE}
               stroke="white"
-              fill={col}
+              fill={!gameOverFlag ? col : "black"}
               key={`mino${i}`}
             ></rect>
           );
@@ -531,24 +529,24 @@ const Tetris = () => {
       dy++;
     }
     dy--;
-    console.log(y);
     return (
       <g>
-        {mino.map((m, i) => {
-          const x1 = (x + m[0]) * BLOCK_SIZE + X0;
-          const y1 = (dy + m[1]) * BLOCK_SIZE + Y0;
-          return (
-            <rect
-              x={x1}
-              y={y1}
-              width={BLOCK_SIZE}
-              height={BLOCK_SIZE}
-              stroke={col}
-              fill="transparent"
-              key={`forecast${i}`}
-            ></rect>
-          );
-        })}
+        {!gameOverFlag &&
+          mino.map((m, i) => {
+            const x1 = (x + m[0]) * BLOCK_SIZE + X0;
+            const y1 = (dy + m[1]) * BLOCK_SIZE + Y0;
+            return (
+              <rect
+                x={x1}
+                y={y1}
+                width={BLOCK_SIZE}
+                height={BLOCK_SIZE}
+                stroke={col}
+                fill="transparent"
+                key={`forecast${i}`}
+              ></rect>
+            );
+          })}
       </g>
     );
   };
@@ -644,20 +642,154 @@ const Tetris = () => {
     );
   };
 
+  const DrawGameclear = () => {
+    return (
+      <g transform={`translate(${X0 + BLOCK_SIZE * 2},${Y0 + BLOCK_SIZE * 8})`}>
+        <rect
+          x={0}
+          y={0}
+          width={BLOCK_SIZE * 8}
+          height={BLOCK_SIZE * 4}
+          fill="black"
+          stroke="white"
+        ></rect>
+        <text
+          x={BLOCK_SIZE * 0.25}
+          y={BLOCK_SIZE * 1.5}
+          fontSize="20"
+          fill="white"
+        >
+          GameClear!
+        </text>
+        <text
+          x={BLOCK_SIZE * 1.5}
+          y={BLOCK_SIZE * 3.5}
+          fontSize="15"
+          fill="white"
+        >
+          Press Esc
+        </text>
+      </g>
+    );
+  };
+
+  const DrawGameover = () => {
+    return (
+      <g transform={`translate(${X0 + BLOCK_SIZE * 2},${Y0 + BLOCK_SIZE * 8})`}>
+        <rect
+          x={0}
+          y={0}
+          width={BLOCK_SIZE * 8}
+          height={BLOCK_SIZE * 4}
+          fill="black"
+          stroke="white"
+        ></rect>
+        <text
+          x={BLOCK_SIZE * 0.25}
+          y={BLOCK_SIZE * 1.5}
+          fontSize="20"
+          fill="white"
+        >
+          Game Over
+        </text>
+        <text
+          x={BLOCK_SIZE * 1.5}
+          y={BLOCK_SIZE * 3.5}
+          fontSize="15"
+          fill="white"
+        >
+          Press Esc
+        </text>
+      </g>
+    );
+  };
+
+  const DrawTitle = () => {
+    return (
+      <g>
+        <text x={125} y={100} fill="white" fontSize={50}>
+          TETRIS QUEST
+        </text>
+        <image
+          href="src\assets\yusha.png"
+          x="100"
+          y="150"
+          width={100}
+          height={100}
+        />
+        <image
+          href="src\assets\senshi.png"
+          x="250"
+          y="150"
+          width={100}
+          height={100}
+        />
+        <image
+          href="src\assets\mahotsukai.png"
+          x="400"
+          y="150"
+          width={100}
+          height={100}
+        />
+        <image
+          href="src\assets\slime.png"
+          x="100"
+          y="300"
+          width={100}
+          height={100}
+        />
+        <image
+          href="src\assets\mummy.png"
+          x="250"
+          y="300"
+          width={100}
+          height={100}
+        />
+        <image
+          href="src\assets\shinigami.png"
+          x="400"
+          y="300"
+          width={100}
+          height={100}
+        />
+        <text x={225} y={500} fill="white" fontSize={30}>
+          Press Enter
+        </text>
+      </g>
+    );
+  };
+
+  const DrawSelect = () => {
+    return <g>Select</g>;
+  };
+
+  const DrawGame = () => {
+    return (
+      <g>
+        <DrawField></DrawField>
+        <DrawForecast></DrawForecast>
+        <DrawMino></DrawMino>
+
+        <DrawNext></DrawNext>
+        <DrawHold></DrawHold>
+
+        {gameClearFlag && <DrawGameclear></DrawGameclear>}
+        {gameOverFlag && <DrawGameover></DrawGameover>}
+      </g>
+    );
+  };
+
   return (
     <svg
       width="600"
-      height="540"
-      viewBox="0, 0, 600, 540"
+      height="600"
+      viewBox="0, 0, 600, 600"
       xmlns="http://www.w3.org/2000/svg"
       style={{ backgroundColor: "black" }}
     >
-      <DrawField></DrawField>
-      <DrawForecast></DrawForecast>
-      <DrawMino></DrawMino>
-
-      <DrawNext></DrawNext>
-      <DrawHold></DrawHold>
+      {gameStatus === 0 && <DrawTitle></DrawTitle>}
+      {gameStatus === 1 && <DrawSelect></DrawSelect>}
+      {gameStatus === 2 && <DrawGame></DrawGame>}
     </svg>
   );
 };
