@@ -1,9 +1,7 @@
 import Tetris from "./components/Tetris";
 
 const App = () => {
-    return <div>
-        <Tetris></Tetris>
-    </div>
-}
+  return <Tetris></Tetris>;
+};
 
 export default App;

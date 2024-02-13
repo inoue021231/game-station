@@ -19,7 +19,9 @@ BLOCK_SIZE = 15
 X0 = 235
 ###
 Y0 = 220
+###
 MAX_HP = [3, 5, 7, 12, 10, 15]
+###
 ATTACK_COUNT = [7, 5, 4, 3, 5, 2]
 
 ###
@@ -89,7 +91,9 @@ COLOR = [
     "dim gray",
 ]
 
+###
 canvas_width = FIELD_WIDTH * BLOCK_SIZE
+###
 canvas_height = FIELD_HEIGHT * BLOCK_SIZE
 
 
@@ -752,6 +756,7 @@ class Game:
             self.delete()
             self.new_mino(-1)
 
+    ###
     def mino_hold(self):
         if self.hold_idx == -1:
             self.hold_idx = self.mino_idx
@@ -826,6 +831,7 @@ class Game:
         )
         self.id = self.root.after(2000, self.game_main_proc)
 
+    ###
     def set_field(self):
         m = MINO[self.mino_idx][self.rot_status]
         for i in range(4):
