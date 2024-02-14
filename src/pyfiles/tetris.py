@@ -150,6 +150,7 @@ class SystemHandler:
         )
         self.id = self.root.after(100, self.select_main_proc)
 
+    ###
     def game_status_change(self, n):
         if self.game_status == 2:
             self.game.root.after_cancel(self.game.id)
@@ -489,6 +490,7 @@ class SystemHandler:
 
                 self.game.create_game_scene()
 
+    ###
     """ def joy(self):
         pygame.init()
         pygame.joystick.init()
@@ -821,6 +823,7 @@ class Game:
             self.at_count += 5
         self.sound.skill_sound.play()
 
+    ###
     def ready(self):
         self.canvas.create_text(
             canvas_width / 2 + X0,
@@ -913,6 +916,7 @@ class Field:
         self.clear_fnt = ("Times New Roman", BLOCK_SIZE + 10)
         self.press_fnt = ("Times New Roman", BLOCK_SIZE)
 
+    ###
     def draw_background(self, select_idx):
         if select_idx == 0:
             self.canvas.create_image(325, 150, image=self.easy_img)
@@ -927,6 +931,7 @@ class Field:
         else:
             self.canvas.create_image(325, 120, image=self.secret2_img)
 
+    ###
     def draw_description(self):
         self.canvas.create_rectangle(
             100, 100, 500, 500, outline="white", width=1, fill="black"
@@ -955,6 +960,7 @@ class Field:
         self.canvas.create_text(
             310, 320, text="Qキー:技", fill="white", font=("Times New Roman", 10)
         )
+
 
     def draw_charaselect(self, idx):
         self.canvas.create_rectangle(
@@ -1000,6 +1006,7 @@ class Field:
             font=("Times New Roman", 25),
         )
 
+    ###
     def draw_chara(self, idx, skill_count):
         self.canvas.create_rectangle(
             X0 - 65,
@@ -1233,7 +1240,7 @@ class Field:
         self.canvas.create_image(300, 350, image=self.normal_img)
         self.canvas.create_image(500, 350, image=self.hard_img)
 
-
+    ###
     def draw_select(self, select_idx, chara_idx, secret_flag):
         if self.description_flag:
             self.draw_description()
