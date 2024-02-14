@@ -981,6 +981,7 @@ class Field:
             self.canvas.create_image(300, 300, image=self.chara2_img)
             self.canvas.create_image(450, 250, image=self.chara3_img)
 
+    ###
     def draw_credit(self):
         self.canvas.create_rectangle(
             100, 100, 500, 500, outline="white", width=1, fill="black"
@@ -1082,6 +1083,7 @@ class Field:
                 x1, y1, x2, y2, outline="white", width=1, fill=col
             )
 
+    ###
     def draw_hp(self, hp, select_idx):
         hp_x = X0 + BLOCK_SIZE
         bar = (canvas_width - (BLOCK_SIZE * 2)) / MAX_HP[select_idx]
@@ -1152,6 +1154,7 @@ class Field:
                 )
             y += 5
 
+    ###
     def draw_attack(self, at_count):
         col = "green"
         self.canvas.create_rectangle(
@@ -1180,6 +1183,7 @@ class Field:
             fill=col,
         )
 
+    ###
     def draw_gameclear(self):
         self.canvas.create_text(
             canvas_width / 2 + X0,
@@ -1196,6 +1200,7 @@ class Field:
             font=self.press_fnt,
         )
 
+    ###
     def draw_gameover(self):
         self.canvas.create_text(
             canvas_width / 2 + X0,
@@ -1212,6 +1217,8 @@ class Field:
             font=self.press_fnt,
         )
 
+
+    ###
     def draw_title(self):
         self.canvas.create_text(
             310, 100, text="TETRIS QUEST", fill="white", font=("Times New Roman", 40)
@@ -1225,6 +1232,7 @@ class Field:
         self.canvas.create_image(100, 350, image=self.easy_img)
         self.canvas.create_image(300, 350, image=self.normal_img)
         self.canvas.create_image(500, 350, image=self.hard_img)
+
 
     def draw_select(self, select_idx, chara_idx, secret_flag):
         if self.description_flag:
