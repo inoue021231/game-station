@@ -254,8 +254,7 @@ const Tetris = () => {
   const [holdIdx, setHoldIdx] = useState(-1);
   const [nextMino, setNextMino] = useState([-1, -1, -1]);
   const [prevMino, setPrevMino] = useState([0, 0, 0, 0, 0, 0, 0]);
-
-  const [gameStatus, setGameStatus] = useState(0);
+  const [gameStatus, setGameStatus] = useState(1);
 
   const [gameOverFlag, setGameOverFlag] = useState(false);
   const [gameClearFlag, setGameClearFlag] = useState(false);
@@ -760,7 +759,101 @@ const Tetris = () => {
   };
 
   const DrawSelect = () => {
-    return <g>Select</g>;
+    return (
+      <g>
+        <text
+          x="590"
+          y="30"
+          fontSize="20"
+          dominantBaseline="Hanging"
+          textAnchor="end"
+          fill="white"
+        >
+          illust:DOT ILLUST
+        </text>
+        <text
+          x="590"
+          y="10"
+          fontSize="20"
+          dominantBaseline="Hanging"
+          textAnchor="end"
+          fill="white"
+        >
+          music:魔王魂
+        </text>
+
+        <g transform="translate(0,-70)">
+          <g transform="translate(10,150)">
+            <image href="src\assets\slime.png" y="0" width={100} height={100} />
+            <image
+              href="src\assets\mummy.png"
+              y="150"
+              width={100}
+              height={100}
+            />
+            <image
+              href="src\assets\devil.png"
+              y="300"
+              width={100}
+              height={100}
+            />
+          </g>
+          <g transform="translate(150, 210)" fill="white" fontSize="30">
+            <text x="20" y="0">
+              EASY
+            </text>
+            <text x="0" y="150">
+              NORMAL
+            </text>
+            <text x="20" y="300">
+              HARD
+            </text>
+            <text x="-70" y="420">
+              How To Play
+            </text>
+          </g>
+
+          <g transform="translate(300,150)">
+            <image
+              href="src\assets\shinigami.png"
+              y="0"
+              width={100}
+              height={100}
+            />
+            <image href="src\assets\mao.png" y="150" width={100} height={100} />
+            <image
+              href="src\assets\heishi.png"
+              y="300"
+              width={100}
+              height={100}
+            />
+          </g>
+          <g transform="translate(440,210)" fill="white" fontSize="30">
+            <text x="0" y="0">
+              EXPERT
+            </text>
+            <text x="0" y="150" fill="yellow">
+              SECRET
+            </text>
+            <text x="-10" y="300">
+              ENDLESS
+            </text>
+            <text x="-70" y="420">
+              Select Chara
+            </text>
+          </g>
+        </g>
+        <line
+          x1="0"
+          y1="500"
+          x2="600"
+          y2="500"
+          stroke="white"
+          strokeDasharray="15"
+        ></line>
+        <g transform="translate()"></g>
+      </g>
+    );
   };
 
   const DrawGame = () => {
