@@ -1,4 +1,5 @@
-import { useEffect, useCallback, useState } from "react";
+import { useState, useEffect } from "react";
+import Gamepad from "react-gamepad";
 
 const Tetris = () => {
   const FIELD_WIDTH = 12;
@@ -278,6 +279,8 @@ const Tetris = () => {
   const [tspinFlag, setTspinFlag] = useState(false);
   const [secretFlag, setSecretFlag] = useState(false);
 
+  const [gamepad, setGamepad] = useState({ buttonName: "", pressed: false });
+
   const canMove = (dx, dy, rot) => {
     const mino = MINO[minoIdx][rot];
     return !mino.find((m, i) => minoStatus[dy + m[1]][dx + m[0]] >= 1);
@@ -296,12 +299,29 @@ const Tetris = () => {
     }
   };
 
-  const handleKeyFunction = (event) => {
-    const k = event.keyCode;
+  const handleKeyFunction = (event, button) => {
+    const k = event ? event.keyCode : button;
+    console.log(k);
 
     let dx = 4;
     let dy = 0;
     let rot = 0;
+
+    if (gameStatus === 0) {
+      if (k === 13) {
+        setGameStatus(1);
+      }
+    } else if (gameStatus === 1) {
+      if (k === 13) {
+        setGameStatus(2);
+      } else if (k === 27) {
+        setGameStatus(0);
+      }
+    } else {
+      if (k === 27 && !gameReadyFlag) {
+        setGameStatus(1);
+      }
+    }
 
     if (gameStatus === 2) {
       dx = x;
@@ -361,13 +381,6 @@ const Tetris = () => {
       }
     }
   };
-
-  useEffect(() => {
-    document.addEventListener("keydown", handleKeyFunction);
-    return () => {
-      document.removeEventListener("keydown", handleKeyFunction);
-    };
-  }, [handleKeyFunction]);
 
   const setupField = (dy = 0) => {
     const mino = MINO[minoIdx][rotStatus];
@@ -464,32 +477,6 @@ const Tetris = () => {
       newMino(-1);
     }
   };
-
-  useEffect(() => {
-    next();
-  }, []);
-
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (hp <= 0) {
-        if (!secretFlag && selectLevel === 4) {
-          // secret第二スタート
-        } else {
-          //ゲームクリア
-          setGameClearFlag(true);
-        }
-      } else if (canMove(x, y, rotStatus)) {
-        downCheck();
-      } else {
-        console.log("gameover");
-        setGameOverFlag(true);
-      }
-    }, 1000);
-
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, [y, canMove]);
 
   const DrawField = () => {
     return (
@@ -717,8 +704,7 @@ const Tetris = () => {
                 width={canvasWidth / MAX_HP[selectLevel]}
                 height={BLOCK_SIZE * 1.5}
                 fill="green"
-                stroke="black"
-                /* stroke="transparent" */
+                stroke="transparent"
                 key={i}
               ></rect>
             );
@@ -837,6 +823,29 @@ const Tetris = () => {
     );
   };
 
+  const DrawReady = () => {
+    return (
+      <g transform={`translate(${X0 + BLOCK_SIZE * 2},${Y0 + BLOCK_SIZE * 8})`}>
+        <rect
+          x={0}
+          y={0}
+          width={BLOCK_SIZE * 8}
+          height={BLOCK_SIZE * 4}
+          fill="black"
+          stroke="white"
+        ></rect>
+        <text
+          x={BLOCK_SIZE * 1.5}
+          y={BLOCK_SIZE * 2.25}
+          fontSize="20"
+          fill="white"
+        >
+          Ready?
+        </text>
+      </g>
+    );
+  };
+
   const DrawGameclear = () => {
     return (
       <g transform={`translate(${X0 + BLOCK_SIZE * 2},${Y0 + BLOCK_SIZE * 8})`}>
@@ -925,6 +934,7 @@ const Tetris = () => {
   };
 
   const DrawSelect = () => {
+    const underLine = () => {};
     return (
       <g>
         <text
@@ -997,7 +1007,6 @@ const Tetris = () => {
           stroke="white"
           strokeDasharray="15"
         ></line>
-        <g transform="translate()"></g>
       </g>
     );
   };
@@ -1006,8 +1015,13 @@ const Tetris = () => {
     return (
       <g>
         <DrawField></DrawField>
-        <DrawForecast></DrawForecast>
-        <DrawMino></DrawMino>
+
+        {!gameReadyFlag && (
+          <g>
+            <DrawMino></DrawMino>
+            <DrawForecast></DrawForecast>
+          </g>
+        )}
 
         <DrawNext></DrawNext>
         <DrawHold></DrawHold>
@@ -1016,24 +1030,165 @@ const Tetris = () => {
         <DrawAttack></DrawAttack>
         <DrawSkill></DrawSkill>
 
+        {gameReadyFlag && <DrawReady></DrawReady>}
         {gameClearFlag && <DrawGameclear></DrawGameclear>}
         {gameOverFlag && <DrawGameover></DrawGameover>}
       </g>
     );
   };
 
+  useEffect(() => {
+    if (gameStatus === 2) {
+      setGameReadyFlag(true);
+      setX(4);
+      setY(0);
+      setRotStatus(0);
+      setSkillCount(5);
+      setHp(MAX_HP[selectLevel]);
+      setAtCount(ATTACK_COUNT[selectLevel]);
+      setMinoIdx(0);
+      setHoldIdx(-1);
+      setNextMino([-1, -1, -1]);
+      setPrevMino([0, 0, 0, 0, 0, 0, 0]);
+      setGameOverFlag(false);
+      setGameClearFlag(false);
+      setHoldFlag(true);
+      setTspinFlag(false);
+      setSecretFlag(false);
+      setMinoStatus([
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      ]);
+    }
+    const timeoutId = setTimeout(() => {
+      setGameReadyFlag(false);
+      next();
+    }, 2000);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [gameStatus]);
+
+  useEffect(() => {
+    document.addEventListener("keydown", handleKeyFunction);
+    return () => {
+      document.removeEventListener("keydown", handleKeyFunction);
+    };
+  }, [handleKeyFunction]);
+
+  useEffect(() => {
+    next();
+  }, []);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (!gameReadyFlag) {
+        if (hp <= 0) {
+          if (!secretFlag && selectLevel === 4) {
+            // secret第二スタート
+          } else {
+            //ゲームクリア
+            setGameClearFlag(true);
+          }
+        } else if (canMove(x, y, rotStatus)) {
+          downCheck();
+        } else {
+          console.log("gameover");
+          setGameOverFlag(true);
+        }
+      }
+    }, 1000);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [y, canMove]);
+
   return (
-    <svg
-      width="600"
-      height="600"
-      viewBox="0, 0, 600, 600"
-      xmlns="http://www.w3.org/2000/svg"
-      style={{ backgroundColor: "black" }}
+    <Gamepad
+      onA={() => {
+        if (gameStatus === 1) {
+          handleKeyFunction(false, 27);
+        } else {
+          handleKeyFunction(false, 65);
+        }
+      }}
+      onB={() => {
+        if (gameStatus === 0 || gameStatus === 1) {
+          handleKeyFunction(false, 13);
+        } else {
+          handleKeyFunction(false, 68);
+        }
+      }}
+      onX={() => {
+        handleKeyFunction(false, 81);
+      }}
+      onY={() => {
+        handleKeyFunction(false, 81);
+      }}
+      onUp={() => {
+        handleKeyFunction(false, 38);
+      }}
+      onDown={() => {
+        handleKeyFunction(false, 40);
+      }}
+      onLeft={() => {
+        handleKeyFunction(false, 37);
+      }}
+      onRight={() => {
+        handleKeyFunction(false, 39);
+      }}
+      onLB={() => {
+        handleKeyFunction(false, 83);
+      }}
+      onLT={() => {
+        handleKeyFunction(false, 83);
+      }}
+      onRB={() => {
+        handleKeyFunction(false, 83);
+      }}
+      onRT={() => {
+        handleKeyFunction(false, 83);
+      }}
+      onStart={() => {
+        handleKeyFunction(false, 27);
+      }}
+      onBack={() => {
+        handleKeyFunction(false, 27);
+      }}
     >
-      {gameStatus === 0 && <DrawTitle></DrawTitle>}
-      {gameStatus === 1 && <DrawSelect></DrawSelect>}
-      {gameStatus === 2 && <DrawGame></DrawGame>}
-    </svg>
+      <svg
+        width="600"
+        height="600"
+        viewBox="0, 0, 600, 600"
+        xmlns="http://www.w3.org/2000/svg"
+        style={{ backgroundColor: "black" }}
+      >
+        {gameStatus === 0 && <DrawTitle></DrawTitle>}
+        {gameStatus === 1 && <DrawSelect></DrawSelect>}
+        {gameStatus === 2 && <DrawGame></DrawGame>}
+      </svg>
+    </Gamepad>
   );
 };
 
