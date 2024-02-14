@@ -215,6 +215,18 @@ const Tetris = () => {
     "dimgray",
   ];
 
+  const EASY_ENEMY = "src/assets/slime.png";
+  const NORMAL_ENEMY = "src/assets/mummy.png";
+  const HARD_ENEMY = "src/assets/devil.png";
+  const EXPERT_ENEMY = "src/assets/shinigami.png";
+  const SECRET1_ENEMY = "src/assets/mao.png";
+  const SECRET2_ENEMY = "src/assets/dragon.png";
+  const ENDLESS_ENEMY = "src/assets/heishi.png";
+
+  const CHARA_YUSHA = "src/assets/yusha.png";
+  const CHARA_SENSHI = "src/assets/senshi.png";
+  const CHARA_MAHOTSUKAI = "src/assets/mahotsukai.png";
+
   const canvasWidth = FIELD_WIDTH * BLOCK_SIZE;
   const canvasHeight = FIELD_HEIGHT * BLOCK_SIZE;
 
@@ -248,20 +260,23 @@ const Tetris = () => {
   const [y, setY] = useState(0);
   const [rotStatus, setRotStatus] = useState(0);
   const [selectLevel, setSelectLevel] = useState(0);
+  const [charaIdx, setCharaIdx] = useState(0);
+  const [skillCount, setSkillCount] = useState(5);
   const [hp, setHp] = useState(MAX_HP[selectLevel]);
   const [atCount, setAtCount] = useState(ATTACK_COUNT[selectLevel]);
   const [minoIdx, setMinoIdx] = useState(0);
   const [holdIdx, setHoldIdx] = useState(-1);
   const [nextMino, setNextMino] = useState([-1, -1, -1]);
   const [prevMino, setPrevMino] = useState([0, 0, 0, 0, 0, 0, 0]);
-  const [gameStatus, setGameStatus] = useState(1);
+
+  const [gameStatus, setGameStatus] = useState(2);
 
   const [gameOverFlag, setGameOverFlag] = useState(false);
   const [gameClearFlag, setGameClearFlag] = useState(false);
   const [gameReadyFlag, setGameReadyFlag] = useState(false);
   const [holdFlag, setHoldFlag] = useState(true);
   const [tspinFlag, setTspinFlag] = useState(false);
-  const [secretFlag, setSecretFlag] = useState(true);
+  const [secretFlag, setSecretFlag] = useState(false);
 
   const canMove = (dx, dy, rot) => {
     const mino = MINO[minoIdx][rot];
@@ -304,8 +319,13 @@ const Tetris = () => {
           while (canMove(x, dy, rotStatus)) {
             dy++;
           }
-          downCheck();
           dy--;
+          setHoldFlag(true);
+          setTspinFlag(false);
+
+          setupField(dy);
+          deleteLine();
+          newMino(-1);
         } else if (k === 40) {
           dy++;
         } else if (k === 65) {
@@ -349,12 +369,11 @@ const Tetris = () => {
     };
   }, [handleKeyFunction]);
 
-  const setupField = () => {
+  const setupField = (dy = 0) => {
     const mino = MINO[minoIdx][rotStatus];
-    const col = COLOR[minoIdx + 2];
     let newMinoStatus = [...minoStatus];
     mino.forEach((m) => {
-      newMinoStatus[y + m[1]][x + m[0]] = minoIdx + 2;
+      newMinoStatus[dy === 0 ? y + m[1] : dy + m[1]][x + m[0]] = minoIdx + 2;
     });
     setMinoStatus(newMinoStatus);
   };
@@ -433,7 +452,6 @@ const Tetris = () => {
     } */
   };
 
-  // index = 1 急降下、 index = 0 降下中
   const downCheck = () => {
     if (canMove(x, y + 1, rotStatus)) {
       setY((prevY) => prevY + 1);
@@ -454,7 +472,7 @@ const Tetris = () => {
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (hp <= 0) {
-        if (secretFlag && selectLevel === 4) {
+        if (!secretFlag && selectLevel === 4) {
           // secret第二スタート
         } else {
           //ゲームクリア
@@ -463,6 +481,7 @@ const Tetris = () => {
       } else if (canMove(x, y, rotStatus)) {
         downCheck();
       } else {
+        console.log("gameover");
         setGameOverFlag(true);
       }
     }, 1000);
@@ -470,7 +489,7 @@ const Tetris = () => {
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [y]);
+  }, [y, canMove]);
 
   const DrawField = () => {
     return (
@@ -567,9 +586,9 @@ const Tetris = () => {
         ></rect>
         <text
           x={X0 + canvasWidth + BLOCK_SIZE}
-          y={Y0 + 15}
+          y={Y0 + BLOCK_SIZE}
           fill="white"
-          fontSize="15"
+          fontSize={BLOCK_SIZE}
         >
           NEXT
         </text>
@@ -615,7 +634,12 @@ const Tetris = () => {
           fill="black"
           stroke="white"
         ></rect>
-        <text x={X0 - 55} y={Y0 + 15} fill="white" fontSize="15">
+        <text
+          x={X0 - 55}
+          y={Y0 + BLOCK_SIZE}
+          fill="white"
+          fontSize={BLOCK_SIZE}
+        >
           HOLD
         </text>
         {holdIdx !== -1 &&
@@ -637,6 +661,178 @@ const Tetris = () => {
               ></rect>
             );
           })}
+      </g>
+    );
+  };
+
+  const DrawEnemy = () => {
+    const enemy = () => {
+      switch (selectLevel) {
+        case 0:
+          return <image href={EASY_ENEMY} width={100} height={100}></image>;
+        case 1:
+          return <image href={NORMAL_ENEMY} width={100} height={100}></image>;
+        case 2:
+          return <image href={HARD_ENEMY} width={100} height={100}></image>;
+        case 3:
+          return <image href={EXPERT_ENEMY} width={100} height={100}></image>;
+        case 4:
+          return !secretFlag ? (
+            <image href={SECRET1_ENEMY} width={100} height={100}></image>
+          ) : (
+            <image
+              href={SECRET2_ENEMY}
+              x={-BLOCK_SIZE * 3 - 5}
+              y={-BLOCK_SIZE * 4}
+              width={200}
+              height={200}
+            ></image>
+          );
+        case 5:
+          return <image href={ENDLESS_ENEMY} width={100} height={100}></image>;
+      }
+    };
+    return (
+      <g
+        transform={`translate(${X0 + BLOCK_SIZE * 2.5},${Y0 - BLOCK_SIZE * 9})`}
+      >
+        {enemy()}
+      </g>
+    );
+  };
+
+  const DrawHp = () => {
+    return (
+      <g transform={`translate(${X0}, ${Y0 - BLOCK_SIZE * 2.5})`}>
+        <rect
+          width={canvasWidth}
+          height={BLOCK_SIZE * 1.5}
+          stroke="green"
+        ></rect>
+        {selectLevel <= 3 ? (
+          [...Array(MAX_HP[selectLevel])].map((_, i) => {
+            return (
+              <rect
+                x={i * (canvasWidth / MAX_HP[selectLevel])}
+                width={canvasWidth / MAX_HP[selectLevel]}
+                height={BLOCK_SIZE * 1.5}
+                fill="green"
+                stroke="black"
+                /* stroke="transparent" */
+                key={i}
+              ></rect>
+            );
+          })
+        ) : (
+          <g>
+            {[...Array(MAX_HP[!secretFlag ? 4 : 5])].map((_, i) => {
+              return (
+                <rect
+                  x={i * (canvasWidth / MAX_HP[selectLevel])}
+                  width={canvasWidth / MAX_HP[selectLevel]}
+                  height={BLOCK_SIZE * 1.5}
+                  fill="green"
+                  stroke="black"
+                  /* stroke="transparent" */
+                  key={i}
+                ></rect>
+              );
+            })}
+          </g>
+        )}
+      </g>
+    );
+  };
+
+  const DrawAttack = () => {
+    const col = atCount === 1 ? "red" : atCount === 2 ? "yellow" : "green";
+    return (
+      <g
+        transform={`translate(${X0 - BLOCK_SIZE * 4 - 5},${
+          Y0 + BLOCK_SIZE * 4 + 5
+        })`}
+      >
+        <rect
+          width={BLOCK_SIZE * 4}
+          height={BLOCK_SIZE * 6}
+          stroke="white"
+        ></rect>
+        <text x={6} y={BLOCK_SIZE} fontSize={BLOCK_SIZE - 1} fill="white">
+          ENEMY
+        </text>
+        <text x={2} y={BLOCK_SIZE * 2} fontSize={BLOCK_SIZE - 1} fill="white">
+          ATTACK
+        </text>
+        <text
+          x={BLOCK_SIZE * 1.5}
+          y={BLOCK_SIZE * 4}
+          fontSize={BLOCK_SIZE * 1.5}
+          fill={col}
+        >
+          {atCount}
+        </text>
+      </g>
+    );
+  };
+
+  const DrawSkill = () => {
+    const chara = () => {
+      switch (charaIdx) {
+        case 0:
+          return (
+            <image
+              href={CHARA_YUSHA}
+              x={5}
+              y={BLOCK_SIZE * 4}
+              width={50}
+              height={50}
+            ></image>
+          );
+        case 1:
+          return (
+            <image
+              href={CHARA_SENSHI}
+              x={5}
+              y={BLOCK_SIZE * 4}
+              width={50}
+              height={50}
+            ></image>
+          );
+        case 2:
+          return (
+            <image
+              href={CHARA_MAHOTSUKAI}
+              x={5}
+              y={BLOCK_SIZE * 4}
+              width={50}
+              height={50}
+            ></image>
+          );
+      }
+    };
+    return (
+      <g
+        transform={`translate(${X0 - BLOCK_SIZE * 4 - 5},${
+          Y0 + BLOCK_SIZE * 13
+        })`}
+      >
+        <rect
+          width={BLOCK_SIZE * 4}
+          height={BLOCK_SIZE * 8}
+          stroke="white"
+        ></rect>
+        <text x={10} y={BLOCK_SIZE} fill="white" fontSize={BLOCK_SIZE}>
+          SKILL
+        </text>
+        <text
+          x={BLOCK_SIZE * 1.5}
+          y={BLOCK_SIZE * 3}
+          fill="white"
+          fontSize={BLOCK_SIZE * 1.5}
+        >
+          {skillCount}
+        </text>
+        {chara()}
       </g>
     );
   };
@@ -663,7 +859,7 @@ const Tetris = () => {
         <text
           x={BLOCK_SIZE * 1.5}
           y={BLOCK_SIZE * 3.5}
-          fontSize="15"
+          fontSize={BLOCK_SIZE}
           fill="white"
         >
           Press Esc
@@ -694,7 +890,7 @@ const Tetris = () => {
         <text
           x={BLOCK_SIZE * 1.5}
           y={BLOCK_SIZE * 3.5}
-          fontSize="15"
+          fontSize={BLOCK_SIZE}
           fill="white"
         >
           Press Esc
@@ -709,48 +905,18 @@ const Tetris = () => {
         <text x={125} y={100} fill="white" fontSize={50}>
           TETRIS QUEST
         </text>
+        <image href={CHARA_YUSHA} x="100" y="150" width={100} height={100} />
+        <image href={CHARA_SENSHI} x="250" y="150" width={100} height={100} />
         <image
-          href="src\assets\yusha.png"
-          x="100"
-          y="150"
-          width={100}
-          height={100}
-        />
-        <image
-          href="src\assets\senshi.png"
-          x="250"
-          y="150"
-          width={100}
-          height={100}
-        />
-        <image
-          href="src\assets\mahotsukai.png"
+          href={CHARA_MAHOTSUKAI}
           x="400"
           y="150"
           width={100}
           height={100}
         />
-        <image
-          href="src\assets\slime.png"
-          x="100"
-          y="300"
-          width={100}
-          height={100}
-        />
-        <image
-          href="src\assets\mummy.png"
-          x="250"
-          y="300"
-          width={100}
-          height={100}
-        />
-        <image
-          href="src\assets\shinigami.png"
-          x="400"
-          y="300"
-          width={100}
-          height={100}
-        />
+        <image href={EASY_ENEMY} x="100" y="300" width={100} height={100} />
+        <image href={NORMAL_ENEMY} x="250" y="300" width={100} height={100} />
+        <image href={EXPERT_ENEMY} x="400" y="300" width={100} height={100} />
         <text x={225} y={500} fill="white" fontSize={30}>
           Press Enter
         </text>
@@ -784,19 +950,9 @@ const Tetris = () => {
 
         <g transform="translate(0,-70)">
           <g transform="translate(10,150)">
-            <image href="src\assets\slime.png" y="0" width={100} height={100} />
-            <image
-              href="src\assets\mummy.png"
-              y="150"
-              width={100}
-              height={100}
-            />
-            <image
-              href="src\assets\devil.png"
-              y="300"
-              width={100}
-              height={100}
-            />
+            <image href={EASY_ENEMY} y="0" width={100} height={100} />
+            <image href={NORMAL_ENEMY} y="150" width={100} height={100} />
+            <image href={HARD_ENEMY} y="300" width={100} height={100} />
           </g>
           <g transform="translate(150, 210)" fill="white" fontSize="30">
             <text x="20" y="0">
@@ -814,19 +970,9 @@ const Tetris = () => {
           </g>
 
           <g transform="translate(300,150)">
-            <image
-              href="src\assets\shinigami.png"
-              y="0"
-              width={100}
-              height={100}
-            />
-            <image href="src\assets\mao.png" y="150" width={100} height={100} />
-            <image
-              href="src\assets\heishi.png"
-              y="300"
-              width={100}
-              height={100}
-            />
+            <image href={EXPERT_ENEMY} y="0" width={100} height={100} />
+            <image href={SECRET1_ENEMY} y="150" width={100} height={100} />
+            <image href={ENDLESS_ENEMY} y="300" width={100} height={100} />
           </g>
           <g transform="translate(440,210)" fill="white" fontSize="30">
             <text x="0" y="0">
@@ -865,6 +1011,10 @@ const Tetris = () => {
 
         <DrawNext></DrawNext>
         <DrawHold></DrawHold>
+        <DrawEnemy></DrawEnemy>
+        <DrawHp></DrawHp>
+        <DrawAttack></DrawAttack>
+        <DrawSkill></DrawSkill>
 
         {gameClearFlag && <DrawGameclear></DrawGameclear>}
         {gameOverFlag && <DrawGameover></DrawGameover>}
