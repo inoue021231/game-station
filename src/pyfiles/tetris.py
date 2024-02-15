@@ -602,6 +602,7 @@ class Game:
         self.create_game_scene()
         self.ready()
 
+    ###
     def attack(self):
         if self.at_count == 0:
             at = [1]
