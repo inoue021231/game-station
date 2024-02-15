@@ -261,6 +261,7 @@ const Tetris = () => {
   const [y, setY] = useState(0);
   const [rotStatus, setRotStatus] = useState(0);
   const [selectLevel, setSelectLevel] = useState(0);
+  const [selectChara, setSelectChara] = useState(false);
   const [charaIdx, setCharaIdx] = useState(0);
   const [skillCount, setSkillCount] = useState(5);
   const [hp, setHp] = useState(MAX_HP[selectLevel]);
@@ -270,7 +271,7 @@ const Tetris = () => {
   const [nextMino, setNextMino] = useState([-1, -1, -1]);
   const [prevMino, setPrevMino] = useState([0, 0, 0, 0, 0, 0, 0]);
 
-  const [gameStatus, setGameStatus] = useState(2);
+  const [gameStatus, setGameStatus] = useState(0);
 
   const [gameOverFlag, setGameOverFlag] = useState(false);
   const [gameClearFlag, setGameClearFlag] = useState(false);
@@ -278,8 +279,6 @@ const Tetris = () => {
   const [holdFlag, setHoldFlag] = useState(true);
   const [tspinFlag, setTspinFlag] = useState(false);
   const [secretFlag, setSecretFlag] = useState(false);
-
-  const [gamepad, setGamepad] = useState({ buttonName: "", pressed: false });
 
   const canMove = (dx, dy, rot) => {
     const mino = MINO[minoIdx][rot];
@@ -289,12 +288,10 @@ const Tetris = () => {
   const hold = () => {
     if (holdIdx === -1) {
       setHoldIdx(minoIdx);
-      setHoldFlag(false);
       newMino(-1);
     } else {
       const tmp = holdIdx;
       setHoldIdx(minoIdx);
-      setHoldFlag(false);
       newMino(tmp);
     }
   };
@@ -313,9 +310,50 @@ const Tetris = () => {
       }
     } else if (gameStatus === 1) {
       if (k === 13) {
+        if (selectLevel <= -1) {
+          setSelectChara(true);
+        }
         setGameStatus(2);
       } else if (k === 27) {
         setGameStatus(0);
+      } else if (k === 40) {
+        if (
+          selectLevel === 0 ||
+          selectLevel === 1 ||
+          selectLevel === 3 ||
+          selectLevel === 4
+        ) {
+          setSelectLevel((prevLevel) => prevLevel + 1);
+        } else if (selectLevel === 2) {
+          setSelectLevel(-1);
+        } else if (selectLevel === 5) {
+          setSelectLevel(-2);
+        }
+      } else if (k === 38) {
+        if (
+          selectLevel === 1 ||
+          selectLevel === 2 ||
+          selectLevel === 4 ||
+          selectLevel === 5
+        ) {
+          setSelectLevel((prevLevel) => prevLevel - 1);
+        } else if (selectLevel === -1) {
+          setSelectLevel(2);
+        } else if (selectLevel === -2) {
+          setSelectLevel(5);
+        }
+      } else if (k === 39) {
+        if (selectLevel >= 0 && selectLevel <= 2) {
+          setSelectLevel((prevLevel) => prevLevel + 3);
+        } else if (selectLevel === -1) {
+          setSelectLevel(-2);
+        }
+      } else if (k === 37) {
+        if (selectLevel >= 3 && selectLevel <= 5) {
+          setSelectLevel((prevLevel) => prevLevel - 3);
+        } else if (selectLevel === -2) {
+          setSelectLevel(-1);
+        }
       }
     } else {
       if (k === 27 && !gameReadyFlag) {
@@ -357,6 +395,7 @@ const Tetris = () => {
         } else if (k === 83) {
           if (holdFlag) {
             // hold.sound()
+            setHoldFlag(false);
             hold();
             dx = 4;
             dy = 0;
@@ -434,7 +473,20 @@ const Tetris = () => {
     }
   };
 
-  const attack = () => {};
+  const attack = () => {
+    if (atCount === 0) {
+      let at = [1, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 1];
+      const randomIndex = Math.floor(Math.random() * 10);
+      at[randomIndex + 1] = 0;
+      const newStatus = [...minoStatus];
+      newStatus.splice(0, 1);
+      newStatus.splice(FIELD_HEIGHT - 2, 0, at);
+      setMinoStatus(newStatus);
+      setAtCount(ATTACK_COUNT[selectLevel]);
+    } else {
+      setAtCount((prevCount) => prevCount - 1);
+    }
+  };
 
   const deleteLine = () => {
     let newMinoStatus = [...minoStatus];
@@ -460,9 +512,9 @@ const Tetris = () => {
       setMinoIdx(index);
     }
 
-    /* if(holdFlag) {
-        attack();
-    } */
+    if (holdFlag) {
+      attack();
+    }
   };
 
   const downCheck = () => {
@@ -718,8 +770,7 @@ const Tetris = () => {
                   width={canvasWidth / MAX_HP[selectLevel]}
                   height={BLOCK_SIZE * 1.5}
                   fill="green"
-                  stroke="black"
-                  /* stroke="transparent" */
+                  stroke="transparent"
                   key={i}
                 ></rect>
               );
@@ -731,7 +782,7 @@ const Tetris = () => {
   };
 
   const DrawAttack = () => {
-    const col = atCount === 1 ? "red" : atCount === 2 ? "yellow" : "green";
+    const col = atCount === 0 ? "red" : atCount === 1 ? "yellow" : "green";
     return (
       <g
         transform={`translate(${X0 - BLOCK_SIZE * 4 - 5},${
@@ -934,7 +985,6 @@ const Tetris = () => {
   };
 
   const DrawSelect = () => {
-    const underLine = () => {};
     return (
       <g>
         <text
@@ -965,16 +1015,35 @@ const Tetris = () => {
             <image href={HARD_ENEMY} y="300" width={100} height={100} />
           </g>
           <g transform="translate(150, 210)" fill="white" fontSize="30">
-            <text x="20" y="0">
+            <text
+              x="20"
+              y="0"
+              style={{
+                textDecoration: selectLevel === 0 && "underline",
+              }}
+            >
               EASY
             </text>
-            <text x="0" y="150">
+
+            <text
+              x="0"
+              y="150"
+              style={{ textDecoration: selectLevel === 1 && "underline" }}
+            >
               NORMAL
             </text>
-            <text x="20" y="300">
+            <text
+              x="20"
+              y="300"
+              style={{ textDecoration: selectLevel === 2 && "underline" }}
+            >
               HARD
             </text>
-            <text x="-70" y="420">
+            <text
+              x="-70"
+              y="420"
+              style={{ textDecoration: selectLevel === -1 && "underline" }}
+            >
               How To Play
             </text>
           </g>
@@ -985,16 +1054,35 @@ const Tetris = () => {
             <image href={ENDLESS_ENEMY} y="300" width={100} height={100} />
           </g>
           <g transform="translate(440,210)" fill="white" fontSize="30">
-            <text x="0" y="0">
+            <text
+              x="0"
+              y="0"
+              style={{ textDecoration: selectLevel === 3 && "underline" }}
+            >
               EXPERT
             </text>
-            <text x="0" y="150" fill="yellow">
+            <text
+              x="0"
+              y="150"
+              fill="yellow"
+              style={{ textDecoration: selectLevel === 4 && "underline" }}
+            >
               SECRET
             </text>
-            <text x="-10" y="300">
+            <text
+              x="-10"
+              y="300"
+              style={{
+                textDecoration: selectLevel === 5 && "underline",
+              }}
+            >
               ENDLESS
             </text>
-            <text x="-70" y="420">
+            <text
+              x="-70"
+              y="420"
+              style={{ textDecoration: selectLevel === -2 && "underline" }}
+            >
               Select Chara
             </text>
           </g>
