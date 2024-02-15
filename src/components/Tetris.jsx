@@ -216,17 +216,27 @@ const Tetris = () => {
     "dimgray",
   ];
 
-  const EASY_ENEMY = "/src/assets/slime.png";
-  const NORMAL_ENEMY = "/src/assets/mummy.png";
-  const HARD_ENEMY = "/src/assets/devil.png";
-  const EXPERT_ENEMY = "/src/assets/shinigami.png";
-  const SECRET1_ENEMY = "/src/assets/mao.png";
-  const SECRET2_ENEMY = "/src/assets/dragon.png";
-  const ENDLESS_ENEMY = "/src/assets/heishi.png";
+  const EASY_ENEMY =
+    "https://github.com/inoue021231/game-station/blob/main/src/assets/slime.png?raw=true";
+  const NORMAL_ENEMY =
+    "https://github.com/inoue021231/game-station/blob/main/src/assets/mummy.png?raw=true";
+  const HARD_ENEMY =
+    "https://github.com/inoue021231/game-station/blob/main/src/assets/devil.png?raw=true";
+  const EXPERT_ENEMY =
+    "https://github.com/inoue021231/game-station/blob/main/src/assets/shinigami.png?raw=true";
+  const SECRET1_ENEMY =
+    "https://github.com/inoue021231/game-station/blob/main/src/assets/mao.png?raw=true";
+  const SECRET2_ENEMY =
+    "https://github.com/inoue021231/game-station/blob/main/src/assets/dragon.png?raw=true";
+  const ENDLESS_ENEMY =
+    "https://github.com/inoue021231/game-station/blob/main/src/assets/heishi.png?raw=true";
 
-  const CHARA_YUSHA = "/src/assets/yusha.png";
-  const CHARA_SENSHI = "/src/assets/senshi.png";
-  const CHARA_MAHOTSUKAI = "/src/assets/mahotsukai.png";
+  const CHARA_YUSHA =
+    "https://github.com/inoue021231/game-station/blob/main/src/assets/yusha.png?raw=true";
+  const CHARA_SENSHI =
+    "https://github.com/inoue021231/game-station/blob/main/src/assets/senshi.png?raw=true";
+  const CHARA_MAHOTSUKAI =
+    "https://github.com/inoue021231/game-station/blob/main/src/assets/mahotsukai.png?raw=true";
 
   const canvasWidth = FIELD_WIDTH * BLOCK_SIZE;
   const canvasHeight = FIELD_HEIGHT * BLOCK_SIZE;
