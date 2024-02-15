@@ -216,17 +216,17 @@ const Tetris = () => {
     "dimgray",
   ];
 
-  const EASY_ENEMY = "src/assets/slime.png";
-  const NORMAL_ENEMY = "src/assets/mummy.png";
-  const HARD_ENEMY = "src/assets/devil.png";
-  const EXPERT_ENEMY = "src/assets/shinigami.png";
-  const SECRET1_ENEMY = "src/assets/mao.png";
-  const SECRET2_ENEMY = "src/assets/dragon.png";
-  const ENDLESS_ENEMY = "src/assets/heishi.png";
+  const EASY_ENEMY = "/src/assets/slime.png";
+  const NORMAL_ENEMY = "/src/assets/mummy.png";
+  const HARD_ENEMY = "/src/assets/devil.png";
+  const EXPERT_ENEMY = "/src/assets/shinigami.png";
+  const SECRET1_ENEMY = "/src/assets/mao.png";
+  const SECRET2_ENEMY = "/src/assets/dragon.png";
+  const ENDLESS_ENEMY = "/src/assets/heishi.png";
 
-  const CHARA_YUSHA = "src/assets/yusha.png";
-  const CHARA_SENSHI = "src/assets/senshi.png";
-  const CHARA_MAHOTSUKAI = "src/assets/mahotsukai.png";
+  const CHARA_YUSHA = "/src/assets/yusha.png";
+  const CHARA_SENSHI = "/src/assets/senshi.png";
+  const CHARA_MAHOTSUKAI = "/src/assets/mahotsukai.png";
 
   const canvasWidth = FIELD_WIDTH * BLOCK_SIZE;
   const canvasHeight = FIELD_HEIGHT * BLOCK_SIZE;
