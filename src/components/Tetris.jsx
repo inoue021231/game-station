@@ -324,10 +324,11 @@ const Tetris = () => {
     } else if (gameStatus === 1) {
       if (k === 13) {
         if (selectLevel === -2) {
-          setSelectChara(true);
+          // setSelectChara(true);
+          console.log("selectchara");
         } else if (selectLevel === -1) {
           console.log("howtoplay");
-        } else {
+        } else if (selectLevel !== 5) {
           setGameStatus(2);
         }
       } else if (k === 27) {
@@ -550,7 +551,11 @@ const Tetris = () => {
       });
     });
 
-    setSkillCount((prevCount) => prevCount - lineCount);
+    if (skillCount < lineCount) {
+      setSkillCount(0);
+    } else {
+      setSkillCount((prevCount) => prevCount - lineCount);
+    }
 
     if (perfectFlag) {
       damage += 10;
@@ -983,14 +988,26 @@ const Tetris = () => {
         <text x={10} y={BLOCK_SIZE} fill="white" fontSize={BLOCK_SIZE}>
           SKILL
         </text>
-        <text
-          x={BLOCK_SIZE * 1.5}
-          y={BLOCK_SIZE * 3}
-          fill="white"
-          fontSize={BLOCK_SIZE * 1.5}
-        >
-          {skillCount}
-        </text>
+        {skillCount !== 0 ? (
+          <text
+            x={BLOCK_SIZE * 1.5}
+            y={BLOCK_SIZE * 3}
+            fill="white"
+            fontSize={BLOCK_SIZE * 1.5}
+          >
+            {skillCount}
+          </text>
+        ) : (
+          <text
+            x={BLOCK_SIZE * 1}
+            y={BLOCK_SIZE * 3}
+            fill="white"
+            fontSize={BLOCK_SIZE * 1.5}
+          >
+            OK
+          </text>
+        )}
+
         {chara()}
       </g>
     );
