@@ -262,9 +262,11 @@ const Tetris = () => {
   const [rotStatus, setRotStatus] = useState(0);
   const [selectLevel, setSelectLevel] = useState(0);
   const [selectChara, setSelectChara] = useState(false);
+  const [selectHowto, setSelectHowto] = useState(false);
   const [charaIdx, setCharaIdx] = useState(0);
   const [skillCount, setSkillCount] = useState(5);
   const [hp, setHp] = useState(MAX_HP[selectLevel]);
+  const [ren, setRen] = useState(0);
   const [atCount, setAtCount] = useState(ATTACK_COUNT[selectLevel]);
   const [minoIdx, setMinoIdx] = useState(0);
   const [holdIdx, setHoldIdx] = useState(-1);
@@ -277,12 +279,14 @@ const Tetris = () => {
   const [gameClearFlag, setGameClearFlag] = useState(false);
   const [gameReadyFlag, setGameReadyFlag] = useState(false);
   const [holdFlag, setHoldFlag] = useState(true);
+  const [renFlag, setRenFlag] = useState(false);
+  const [btbFlag, setBtbFlag] = useState(false);
   const [tspinFlag, setTspinFlag] = useState(false);
   const [secretFlag, setSecretFlag] = useState(false);
 
   const canMove = (dx, dy, rot) => {
     const mino = MINO[minoIdx][rot];
-    return !mino.find((m, i) => minoStatus[dy + m[1]][dx + m[0]] >= 1);
+    return !mino.find((m) => minoStatus[dy + m[1]][dx + m[0]] >= 1);
   };
 
   const hold = () => {
@@ -298,7 +302,6 @@ const Tetris = () => {
 
   const handleKeyFunction = (event, button) => {
     const k = event ? event.keyCode : button;
-    console.log(k);
 
     let dx = 4;
     let dy = 0;
@@ -310,10 +313,13 @@ const Tetris = () => {
       }
     } else if (gameStatus === 1) {
       if (k === 13) {
-        if (selectLevel <= -1) {
+        if (selectLevel === -2) {
           setSelectChara(true);
+        } else if (selectLevel === -1) {
+          console.log("howtoplay");
+        } else {
+          setGameStatus(2);
         }
-        setGameStatus(2);
       } else if (k === 27) {
         setGameStatus(0);
       } else if (k === 40) {
@@ -368,7 +374,7 @@ const Tetris = () => {
     }
 
     if (gameStatus === 2) {
-      if (!gameOverFlag && !gameReadyFlag) {
+      if (!gameOverFlag && !gameReadyFlag && !gameClearFlag) {
         if (k === 37) {
           dx--;
         } else if (k === 39) {
@@ -514,14 +520,94 @@ const Tetris = () => {
 
   const deleteLine = () => {
     let newMinoStatus = [...minoStatus];
+    let lineCount = 0;
+    let damage = 0;
+    let perfectFlag = true;
     newMinoStatus.forEach((items, i) => {
+      const modelArray = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1];
       let count = items.filter((item) => item >= 1).length;
       if (count === FIELD_WIDTH && i !== FIELD_HEIGHT - 1) {
         newMinoStatus.splice(i, 1);
         newMinoStatus.splice(0, 0, [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
+        lineCount++;
       }
+      if (i !== FIELD_HEIGHT - 1) {
+      }
+      items.map((item, j) => {
+        if (item !== modelArray[j]) {
+          perfectFlag = false;
+        }
+      });
     });
+
+    setSkillCount((prevCount) => prevCount - lineCount);
+
+    if (perfectFlag) {
+      damage += 10;
+      setBtbFlag(false);
+    } else if (lineCount === 0) {
+      setRen(0);
+      setRenFlag(false);
+    } else if (lineCount === 1) {
+      if (tspinFlag) {
+        if (btbFlag) {
+          damage += 3;
+        } else {
+          damage += 2;
+        }
+        setBtbFlag(true);
+      } else {
+        setBtbFlag(false);
+      }
+    } else if (lineCount === 2) {
+      if (tspinFlag) {
+        if (btbFlag) {
+          damage += 5;
+        } else {
+          damage += 4;
+        }
+        setBtbFlag(true);
+      } else {
+        damage += 1;
+        setBtbFlag(false);
+      }
+    } else if (lineCount === 3) {
+      if (tspinFlag) {
+        if (btbFlag) {
+          damage += 7;
+        } else {
+          damage += 6;
+        }
+        setBtbFlag(true);
+      } else {
+        damage += 2;
+        setBtbFlag(false);
+      }
+    } else if (lineCount === 4) {
+      if (btbFlag) {
+        damage += 5;
+      } else {
+        damage += 4;
+      }
+      setBtbFlag(true);
+    }
+    if (renFlag) {
+      if (ren <= 1) {
+      } else if (ren <= 3) {
+        damage += 1;
+      } else if (ren <= 5) {
+        damage += 2;
+      } else if (ren <= 7) {
+        damage += 3;
+      } else if (ren <= 10) {
+        damage += 4;
+      } else {
+        damage += 5;
+      }
+    }
     setMinoStatus(newMinoStatus);
+    setHp((prevHp) => prevHp - damage);
+
     // damage_sound.play()
   };
 
@@ -1013,114 +1099,120 @@ const Tetris = () => {
   const DrawSelect = () => {
     return (
       <g>
-        <text
-          x="590"
-          y="30"
-          fontSize="20"
-          dominantBaseline="Hanging"
-          textAnchor="end"
-          fill="white"
-        >
-          illust:DOT ILLUST
-        </text>
-        <text
-          x="590"
-          y="10"
-          fontSize="20"
-          dominantBaseline="Hanging"
-          textAnchor="end"
-          fill="white"
-        >
-          music:魔王魂
-        </text>
+        {selectHowto && <g></g>}
+        {selectChara && <g></g>}
+        {!selectHowto && !selectChara && (
+          <g>
+            <text
+              x="590"
+              y="10"
+              fontSize="20"
+              dominantBaseline="Hanging"
+              textAnchor="end"
+              fill="white"
+            >
+              illust:DOT ILLUST
+            </text>
+            {/* <text
+              x="590"
+              y="10"
+              fontSize="20"
+              dominantBaseline="Hanging"
+              textAnchor="end"
+              fill="white"
+            >
+              music:魔王魂
+            </text>
+            */}
+            <g transform="translate(0,-70)">
+              <g transform="translate(10,150)">
+                <image href={EASY_ENEMY} y="0" width={100} height={100} />
+                <image href={NORMAL_ENEMY} y="150" width={100} height={100} />
+                <image href={HARD_ENEMY} y="300" width={100} height={100} />
+              </g>
+              <g transform="translate(150, 210)" fill="white" fontSize="30">
+                <text
+                  x="20"
+                  y="0"
+                  style={{
+                    textDecoration: selectLevel === 0 && "underline",
+                  }}
+                >
+                  EASY
+                </text>
 
-        <g transform="translate(0,-70)">
-          <g transform="translate(10,150)">
-            <image href={EASY_ENEMY} y="0" width={100} height={100} />
-            <image href={NORMAL_ENEMY} y="150" width={100} height={100} />
-            <image href={HARD_ENEMY} y="300" width={100} height={100} />
-          </g>
-          <g transform="translate(150, 210)" fill="white" fontSize="30">
-            <text
-              x="20"
-              y="0"
-              style={{
-                textDecoration: selectLevel === 0 && "underline",
-              }}
-            >
-              EASY
-            </text>
+                <text
+                  x="0"
+                  y="150"
+                  style={{ textDecoration: selectLevel === 1 && "underline" }}
+                >
+                  NORMAL
+                </text>
+                <text
+                  x="20"
+                  y="300"
+                  style={{ textDecoration: selectLevel === 2 && "underline" }}
+                >
+                  HARD
+                </text>
+                <text
+                  x="-70"
+                  y="420"
+                  style={{ textDecoration: selectLevel === -1 && "underline" }}
+                >
+                  How To Play
+                </text>
+              </g>
 
-            <text
-              x="0"
-              y="150"
-              style={{ textDecoration: selectLevel === 1 && "underline" }}
-            >
-              NORMAL
-            </text>
-            <text
-              x="20"
-              y="300"
-              style={{ textDecoration: selectLevel === 2 && "underline" }}
-            >
-              HARD
-            </text>
-            <text
-              x="-70"
-              y="420"
-              style={{ textDecoration: selectLevel === -1 && "underline" }}
-            >
-              How To Play
-            </text>
+              <g transform="translate(300,150)">
+                <image href={EXPERT_ENEMY} y="0" width={100} height={100} />
+                <image href={SECRET1_ENEMY} y="150" width={100} height={100} />
+                <image href={ENDLESS_ENEMY} y="300" width={100} height={100} />
+              </g>
+              <g transform="translate(440,210)" fill="white" fontSize="30">
+                <text
+                  x="0"
+                  y="0"
+                  style={{ textDecoration: selectLevel === 3 && "underline" }}
+                >
+                  EXPERT
+                </text>
+                <text
+                  x="0"
+                  y="150"
+                  fill="yellow"
+                  style={{ textDecoration: selectLevel === 4 && "underline" }}
+                >
+                  SECRET
+                </text>
+                <text
+                  x="-10"
+                  y="300"
+                  style={{
+                    textDecoration: selectLevel === 5 && "underline",
+                  }}
+                >
+                  ENDLESS
+                </text>
+                <text
+                  x="-70"
+                  y="420"
+                  style={{ textDecoration: selectLevel === -2 && "underline" }}
+                >
+                  Select Chara
+                </text>
+              </g>
+            </g>
+            <line
+              x1="0"
+              y1="500"
+              x2="600"
+              y2="500"
+              stroke="white"
+              strokeDasharray="15"
+            ></line>
           </g>
-
-          <g transform="translate(300,150)">
-            <image href={EXPERT_ENEMY} y="0" width={100} height={100} />
-            <image href={SECRET1_ENEMY} y="150" width={100} height={100} />
-            <image href={ENDLESS_ENEMY} y="300" width={100} height={100} />
-          </g>
-          <g transform="translate(440,210)" fill="white" fontSize="30">
-            <text
-              x="0"
-              y="0"
-              style={{ textDecoration: selectLevel === 3 && "underline" }}
-            >
-              EXPERT
-            </text>
-            <text
-              x="0"
-              y="150"
-              fill="yellow"
-              style={{ textDecoration: selectLevel === 4 && "underline" }}
-            >
-              SECRET
-            </text>
-            <text
-              x="-10"
-              y="300"
-              style={{
-                textDecoration: selectLevel === 5 && "underline",
-              }}
-            >
-              ENDLESS
-            </text>
-            <text
-              x="-70"
-              y="420"
-              style={{ textDecoration: selectLevel === -2 && "underline" }}
-            >
-              Select Chara
-            </text>
-          </g>
-        </g>
-        <line
-          x1="0"
-          y1="500"
-          x2="600"
-          y2="500"
-          stroke="white"
-          strokeDasharray="15"
-        ></line>
+        )}
       </g>
     );
   };
@@ -1159,6 +1251,7 @@ const Tetris = () => {
       setRotStatus(0);
       setSkillCount(5);
       setHp(MAX_HP[selectLevel]);
+      setRen(0);
       setAtCount(ATTACK_COUNT[selectLevel]);
       setMinoIdx(0);
       setHoldIdx(-1);
@@ -1168,6 +1261,8 @@ const Tetris = () => {
       setGameClearFlag(false);
       setHoldFlag(true);
       setTspinFlag(false);
+      setRenFlag(false);
+      setBtbFlag(false);
       setSecretFlag(false);
       setMinoStatus([
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -1227,7 +1322,6 @@ const Tetris = () => {
         } else if (canMove(x, y, rotStatus)) {
           downCheck();
         } else {
-          console.log("gameover");
           setGameOverFlag(true);
         }
       }
