@@ -811,6 +811,8 @@ class Game:
         self.create_game_scene()
         self.ready()
 
+
+    ###
     def skill(self, idx):
         if idx == 0:
             for _ in range(6):
@@ -932,7 +934,6 @@ class Field:
         else:
             self.canvas.create_image(325, 120, image=self.secret2_img)
 
-    ###
     def draw_description(self):
         self.canvas.create_rectangle(
             100, 100, 500, 500, outline="white", width=1, fill="black"

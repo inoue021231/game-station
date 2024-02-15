@@ -401,6 +401,9 @@ const Tetris = () => {
             dy = 0;
             rot = 0;
           }
+        } else if (k === 81 && skillCount === 0) {
+          skill();
+          setSkillCount(5);
         }
       }
 
@@ -485,6 +488,27 @@ const Tetris = () => {
       setAtCount(ATTACK_COUNT[selectLevel]);
     } else {
       setAtCount((prevCount) => prevCount - 1);
+    }
+  };
+
+  const skill = () => {
+    if (charaIdx === 0) {
+      const newMinoStatus = [...minoStatus];
+      newMinoStatus.splice(FIELD_HEIGHT - 6, 5);
+      newMinoStatus.splice(
+        0,
+        0,
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+      );
+      setMinoStatus(newMinoStatus);
+    } else if (charaIdx === 1) {
+      setHp((prevY) => prevY - 3);
+    } else if (charaIdx === 2) {
+      setAtCount((prevCount) => prevCount + 5);
     }
   };
 
@@ -749,7 +773,8 @@ const Tetris = () => {
           stroke="green"
         ></rect>
         {selectLevel <= 3 ? (
-          [...Array(MAX_HP[selectLevel])].map((_, i) => {
+          hp >= 0 &&
+          [...Array(hp)].map((_, i) => {
             return (
               <rect
                 x={i * (canvasWidth / MAX_HP[selectLevel])}
@@ -763,18 +788,19 @@ const Tetris = () => {
           })
         ) : (
           <g>
-            {[...Array(MAX_HP[!secretFlag ? 4 : 5])].map((_, i) => {
-              return (
-                <rect
-                  x={i * (canvasWidth / MAX_HP[selectLevel])}
-                  width={canvasWidth / MAX_HP[selectLevel]}
-                  height={BLOCK_SIZE * 1.5}
-                  fill="green"
-                  stroke="transparent"
-                  key={i}
-                ></rect>
-              );
-            })}
+            {hp >= 0 &&
+              [...Array(hp)].map((_, i) => {
+                return (
+                  <rect
+                    x={i * (canvasWidth / MAX_HP[!secretFlag ? 4 : 5])}
+                    width={canvasWidth / MAX_HP[!secretFlag ? 4 : 5]}
+                    height={BLOCK_SIZE * 1.5}
+                    fill="green"
+                    stroke="transparent"
+                    key={i}
+                  ></rect>
+                );
+              })}
           </g>
         )}
       </g>
