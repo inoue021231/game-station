@@ -216,6 +216,8 @@ const Tetris = () => {
     "dimgray",
   ];
 
+  const CLEAR_MARK =
+    "https://github.com/inoue021231/game-station/blob/main/src/assets/crown.png?raw=true";
   const EASY_ENEMY =
     "https://github.com/inoue021231/game-station/blob/main/src/assets/slime.png?raw=true";
   const NORMAL_ENEMY =
@@ -275,7 +277,7 @@ const Tetris = () => {
   const [selectHowto, setSelectHowto] = useState(false);
   const [charaIdx, setCharaIdx] = useState(0);
   const [skillCount, setSkillCount] = useState(5);
-  const [clearStages, setClearStages] = useState([true, true, true, true]);
+  const [clearStages, setClearStages] = useState([false, false, false, false]);
   const [hp, setHp] = useState(MAX_HP[selectLevel]);
   const [ren, setRen] = useState(0);
   const [atCount, setAtCount] = useState(ATTACK_COUNT[selectLevel]);
@@ -1123,6 +1125,22 @@ const Tetris = () => {
     );
   };
 
+  const DrawEsc = () => {
+    return (
+      <g>
+        <text
+          x={20}
+          y={10}
+          fontSize={20}
+          fill="white"
+          dominantBaseline="Hanging"
+        >
+          ⇐ESC
+        </text>
+      </g>
+    );
+  };
+
   const DrawTitle = () => {
     return (
       <g>
@@ -1153,6 +1171,7 @@ const Tetris = () => {
 
     return (
       <g>
+        <DrawEsc></DrawEsc>
         {selectHowto && <DrawSelectHowto></DrawSelectHowto>}
         {selectChara && <DrawSelectChara></DrawSelectChara>}
         {!selectHowto && !selectChara && (
@@ -1389,6 +1408,7 @@ const Tetris = () => {
   const DrawGame = () => {
     return (
       <g>
+        <DrawEsc></DrawEsc>
         <DrawField></DrawField>
 
         {!gameReadyFlag && (
@@ -1400,8 +1420,13 @@ const Tetris = () => {
 
         <DrawNext></DrawNext>
         <DrawHold></DrawHold>
-        <DrawEnemy></DrawEnemy>
-        <DrawHp></DrawHp>
+        {!gameClearFlag && (
+          <g>
+            <DrawEnemy></DrawEnemy>
+            <DrawHp></DrawHp>
+          </g>
+        )}
+
         <DrawAttack></DrawAttack>
         <DrawSkill></DrawSkill>
 
