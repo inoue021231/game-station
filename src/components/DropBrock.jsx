@@ -11,8 +11,8 @@ const DropBrock = () => {
   const MAX_HP = [3, 5, 7, 12, 10, 15, 999999];
   const ATTACK_COUNT = [7, 5, 4, 3, 5, 2, 999999];
 
-  const MINO = [
-    // Imino
+  const BLOCK = [
+    // Iblock
     [
       [
         [0, 0],
@@ -39,7 +39,7 @@ const DropBrock = () => {
         [1, 3],
       ],
     ],
-    // Tmino
+    // Tblock
     [
       [
         [1, 0],
@@ -66,7 +66,7 @@ const DropBrock = () => {
         [1, 2],
       ],
     ],
-    // Omino
+    // Oblock
     [
       [
         [1, 0],
@@ -93,7 +93,7 @@ const DropBrock = () => {
         [2, 1],
       ],
     ],
-    // Smino
+    // Sblock
     [
       [
         [1, 0],
@@ -120,7 +120,7 @@ const DropBrock = () => {
         [1, 2],
       ],
     ],
-    // Zmino
+    // Zblock
     [
       [
         [0, 0],
@@ -147,7 +147,7 @@ const DropBrock = () => {
         [0, 2],
       ],
     ],
-    // Jmino
+    // Jblock
     [
       [
         [0, 0],
@@ -174,7 +174,7 @@ const DropBrock = () => {
         [1, 2],
       ],
     ],
-    // Lmino
+    // Lblock
     [
       [
         [2, 0],
@@ -243,7 +243,7 @@ const DropBrock = () => {
   const canvasWidth = FIELD_WIDTH * BLOCK_SIZE;
   const canvasHeight = FIELD_HEIGHT * BLOCK_SIZE;
 
-  const [minoStatus, setMinoStatus] = useState([
+  const [blockStatus, setBlockStatus] = useState([
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -281,10 +281,10 @@ const DropBrock = () => {
   const [hp, setHp] = useState(MAX_HP[selectLevel]);
   const [ren, setRen] = useState(0);
   const [atCount, setAtCount] = useState(ATTACK_COUNT[selectLevel]);
-  const [minoIdx, setMinoIdx] = useState(0);
+  const [blockIdx, setBlockIdx] = useState(0);
   const [holdIdx, setHoldIdx] = useState(-1);
-  const [nextMino, setNextMino] = useState([-1, -1, -1]);
-  const [prevMino, setPrevMino] = useState([0, 0, 0, 0, 0, 0, 0]);
+  const [nextBlock, setNextBlock] = useState([-1, -1, -1]);
+  const [prevBlock, setPrevBlock] = useState([0, 0, 0, 0, 0, 0, 0]);
 
   const [gameStatus, setGameStatus] = useState(0);
 
@@ -298,18 +298,18 @@ const DropBrock = () => {
   const [secretFlag, setSecretFlag] = useState(false);
 
   const canMove = (dx, dy, rot) => {
-    const mino = MINO[minoIdx][rot];
-    return !mino.find((m) => minoStatus[dy + m[1]][dx + m[0]] >= 1);
+    const block = BLOCK[blockIdx][rot];
+    return !block.find((m) => blockStatus[dy + m[1]][dx + m[0]] >= 1);
   };
 
   const hold = () => {
     if (holdIdx === -1) {
-      setHoldIdx(minoIdx);
-      newMino(-1);
+      setHoldIdx(blockIdx);
+      newBlock(-1);
     } else {
       const tmp = holdIdx;
-      setHoldIdx(minoIdx);
-      newMino(tmp);
+      setHoldIdx(blockIdx);
+      newBlock(tmp);
     }
   };
 
@@ -431,7 +431,7 @@ const DropBrock = () => {
 
           setupField(dy);
           deleteLine();
-          newMino(-1);
+          newBlock(-1);
         } else if (k === 40) {
           dy++;
         } else if (k === 65) {
@@ -473,54 +473,56 @@ const DropBrock = () => {
   };
 
   const setupField = (dy = 0) => {
-    const mino = MINO[minoIdx][rotStatus];
-    let newMinoStatus = [...minoStatus];
-    mino.forEach((m) => {
-      newMinoStatus[dy === 0 ? y + m[1] : dy + m[1]][x + m[0]] = minoIdx + 2;
+    const block = BLOCK[blockIdx][rotStatus];
+    let newBlockStatus = [...blockStatus];
+    block.forEach((m) => {
+      newBlockStatus[dy === 0 ? y + m[1] : dy + m[1]][x + m[0]] = blockIdx + 2;
     });
-    setMinoStatus(newMinoStatus);
+    setBlockStatus(newBlockStatus);
   };
 
-  const next = () => {
-    const count = nextMino.filter((item) => item === -1).length;
-    if (count === 3) {
-      let newPrevMino = [0, 0, 0, 0, 0, 0, 0];
+  const next = (index = 0) => {
+    /* const count = nextBlock.filter((item) => item === -1).length;
+    console.log(nextBlock); */
+    if (index === -1) {
+      console.log("first");
+      let newPrevBlock = [0, 0, 0, 0, 0, 0, 0];
 
       let firstIndex = Math.floor(Math.random() * 7);
-      newPrevMino[firstIndex] = 1;
+      newPrevBlock[firstIndex] = 1;
 
-      setMinoIdx(firstIndex);
+      setBlockIdx(firstIndex);
 
-      const newNextMino = nextMino.map(() => {
+      const newNextBlock = nextBlock.map(() => {
         let randomIndex;
         while (true) {
           randomIndex = Math.floor(Math.random() * 7);
-          if (newPrevMino[randomIndex] === 0) {
-            newPrevMino[randomIndex] = 1;
+          if (newPrevBlock[randomIndex] === 0) {
+            newPrevBlock[randomIndex] = 1;
             break;
           }
         }
         return randomIndex;
       });
-      setNextMino(newNextMino);
-      setPrevMino(newPrevMino);
+      setNextBlock(newNextBlock);
+      setPrevBlock(newPrevBlock);
     } else {
-      let newPrevMino =
-        prevMino.filter((item) => item === 1).length === 7
+      let newPrevBlock =
+        prevBlock.filter((item) => item === 1).length === 7
           ? [0, 0, 0, 0, 0, 0, 0]
-          : [...prevMino];
+          : [...prevBlock];
 
       let randomIndex;
       while (true) {
         randomIndex = Math.floor(Math.random() * 7);
-        if (newPrevMino[randomIndex] === 0) {
-          newPrevMino[randomIndex] = 1;
+        if (newPrevBlock[randomIndex] === 0) {
+          newPrevBlock[randomIndex] = 1;
           break;
         }
       }
-      setMinoIdx(nextMino[0]);
-      setNextMino([nextMino[1], nextMino[2], randomIndex]);
-      setPrevMino(newPrevMino);
+      setBlockIdx(nextBlock[0]);
+      setNextBlock([nextBlock[1], nextBlock[2], randomIndex]);
+      setPrevBlock(newPrevBlock);
     }
   };
 
@@ -529,10 +531,10 @@ const DropBrock = () => {
       let at = [1, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 1];
       const randomIndex = Math.floor(Math.random() * 10);
       at[randomIndex + 1] = 0;
-      const newStatus = [...minoStatus];
+      const newStatus = [...blockStatus];
       newStatus.splice(0, 1);
       newStatus.splice(FIELD_HEIGHT - 2, 0, at);
-      setMinoStatus(newStatus);
+      setBlockStatus(newStatus);
       setAtCount(ATTACK_COUNT[selectLevel]);
     } else {
       setAtCount((prevCount) => prevCount - 1);
@@ -541,9 +543,9 @@ const DropBrock = () => {
 
   const skill = () => {
     if (charaIdx === 0) {
-      const newMinoStatus = [...minoStatus];
-      newMinoStatus.splice(FIELD_HEIGHT - 6, 5);
-      newMinoStatus.splice(
+      const newBlockStatus = [...blockStatus];
+      newBlockStatus.splice(FIELD_HEIGHT - 6, 5);
+      newBlockStatus.splice(
         0,
         0,
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -552,7 +554,7 @@ const DropBrock = () => {
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
       );
-      setMinoStatus(newMinoStatus);
+      setBlockStatus(newBlockStatus);
     } else if (charaIdx === 1) {
       setHp((prevY) => prevY - 3);
     } else if (charaIdx === 2) {
@@ -561,16 +563,16 @@ const DropBrock = () => {
   };
 
   const deleteLine = () => {
-    let newMinoStatus = [...minoStatus];
+    let newBlockStatus = [...blockStatus];
     let lineCount = 0;
     let damage = 0;
     let perfectFlag = true;
-    newMinoStatus.forEach((items, i) => {
+    newBlockStatus.forEach((items, i) => {
       const modelArray = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1];
       let count = items.filter((item) => item >= 1).length;
       if (count === FIELD_WIDTH && i !== FIELD_HEIGHT - 1) {
-        newMinoStatus.splice(i, 1);
-        newMinoStatus.splice(0, 0, [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
+        newBlockStatus.splice(i, 1);
+        newBlockStatus.splice(0, 0, [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
         lineCount++;
       }
       if (i !== FIELD_HEIGHT - 1) {
@@ -651,21 +653,21 @@ const DropBrock = () => {
         damage += 5;
       }
     }
-    setMinoStatus(newMinoStatus);
+    setBlockStatus(newBlockStatus);
     setHp((prevHp) => prevHp - damage);
 
     // damage_sound.play()
   };
 
-  const newMino = (index) => {
+  const newBlock = (index) => {
     setX(4);
     setY(0);
     setRotStatus(0);
     if (index === -1) {
-      setMinoIdx(nextMino[0]);
+      setBlockIdx(nextBlock[0]);
       next();
     } else {
-      setMinoIdx(index);
+      setBlockIdx(index);
     }
 
     if (holdFlag) {
@@ -682,15 +684,15 @@ const DropBrock = () => {
 
       setupField();
       deleteLine();
-      newMino(-1);
+      newBlock(-1);
     }
   };
 
   const DrawField = () => {
     return (
       <g>
-        {minoStatus.map((mino, y) => {
-          return mino.map((m, x) => {
+        {blockStatus.map((block, y) => {
+          return block.map((m, x) => {
             const x1 = x * BLOCK_SIZE + X0;
             const y1 = y * BLOCK_SIZE + Y0;
             return (
@@ -710,12 +712,12 @@ const DropBrock = () => {
     );
   };
 
-  const DrawMino = () => {
-    const mino = MINO[minoIdx][rotStatus];
-    const col = COLOR[minoIdx + 2];
+  const DrawBlock = () => {
+    const block = BLOCK[blockIdx][rotStatus];
+    const col = COLOR[blockIdx + 2];
     return (
       <g>
-        {mino.map((m, i) => {
+        {block.map((m, i) => {
           const x1 = (x + m[0]) * BLOCK_SIZE + X0;
           const y1 = (y + m[1]) * BLOCK_SIZE + Y0;
           return (
@@ -726,7 +728,7 @@ const DropBrock = () => {
               height={BLOCK_SIZE}
               stroke="white"
               fill={!gameOverFlag ? col : "black"}
-              key={`mino${i}`}
+              key={`block${i}`}
             ></rect>
           );
         })}
@@ -735,8 +737,8 @@ const DropBrock = () => {
   };
 
   const DrawForecast = () => {
-    const mino = MINO[minoIdx][rotStatus];
-    const col = COLOR[minoIdx + 2];
+    const block = BLOCK[blockIdx][rotStatus];
+    const col = COLOR[blockIdx + 2];
     let dy = y;
     while (canMove(x, dy, rotStatus)) {
       dy++;
@@ -745,7 +747,7 @@ const DropBrock = () => {
     return (
       <g>
         {!gameOverFlag &&
-          mino.map((m, i) => {
+          block.map((m, i) => {
             const x1 = (x + m[0]) * BLOCK_SIZE + X0;
             const y1 = (dy + m[1]) * BLOCK_SIZE + Y0;
             return (
@@ -767,7 +769,7 @@ const DropBrock = () => {
   const DrawNext = () => {
     const dx = 1.5;
     const dy = 2.5;
-    const flag = nextMino.find((item) => item === -1);
+    const flag = nextBlock.find((item) => item === -1);
     const smallBlockSize = (BLOCK_SIZE * 2) / 3;
     return (
       <g>
@@ -788,11 +790,11 @@ const DropBrock = () => {
           NEXT
         </text>
         {!flag &&
-          nextMino.map((index, i) => {
-            const mino = MINO[index][0];
+          nextBlock.map((index, i) => {
+            const block = BLOCK[index][0];
             const col = COLOR[index + 2];
 
-            return mino.map((m, j) => {
+            return block.map((m, j) => {
               const x1 =
                 index === 2 || index === 0
                   ? (dx + m[0] - 0.5) * smallBlockSize + X0 + canvasWidth + 5
@@ -838,7 +840,7 @@ const DropBrock = () => {
           HOLD
         </text>
         {holdIdx !== -1 &&
-          MINO[holdIdx][0].map((m, i) => {
+          BLOCK[holdIdx][0].map((m, i) => {
             const x1 =
               holdIdx === 2 || holdIdx === 0
                 ? (dx + m[0] - 0.5) * smallBlockSize + X0 - BLOCK_SIZE * 5 - 5
@@ -903,6 +905,7 @@ const DropBrock = () => {
           width={canvasWidth}
           height={BLOCK_SIZE * 1.5}
           stroke="green"
+          strokeWidth={1.5}
         ></rect>
         {selectLevel <= 3 ? (
           hp >= 0 &&
@@ -913,7 +916,8 @@ const DropBrock = () => {
                 width={canvasWidth / MAX_HP[selectLevel]}
                 height={BLOCK_SIZE * 1.5}
                 fill="green"
-                stroke="transparent"
+                stroke="green"
+                strokeWidth={1.5}
                 key={i}
               ></rect>
             );
@@ -928,7 +932,8 @@ const DropBrock = () => {
                     width={canvasWidth / MAX_HP[!secretFlag ? 4 : 5]}
                     height={BLOCK_SIZE * 1.5}
                     fill="green"
-                    stroke="transparent"
+                    stroke="green"
+                    strokeWidth={1.5}
                     key={i}
                   ></rect>
                 );
@@ -1435,7 +1440,7 @@ const DropBrock = () => {
         {!gameReadyFlag && (
           <g>
             <DrawForecast></DrawForecast>
-            <DrawMino></DrawMino>
+            <DrawBlock></DrawBlock>
           </g>
         )}
 
@@ -1469,10 +1474,10 @@ const DropBrock = () => {
       setHp(MAX_HP[selectLevel]);
       setRen(0);
       setAtCount(ATTACK_COUNT[selectLevel]);
-      setMinoIdx(0);
+      setBlockIdx(0);
       setHoldIdx(-1);
-      setNextMino([-1, -1, -1]);
-      setPrevMino([0, 0, 0, 0, 0, 0, 0]);
+      setNextBlock([-1, -1, -1]);
+      setPrevBlock([0, 0, 0, 0, 0, 0, 0]);
       setGameOverFlag(false);
       setGameClearFlag(false);
       setHoldFlag(true);
@@ -1480,7 +1485,7 @@ const DropBrock = () => {
       setRenFlag(false);
       setBtbFlag(false);
       setSecretFlag(false);
-      setMinoStatus([
+      setBlockStatus([
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -1508,7 +1513,7 @@ const DropBrock = () => {
     }
     const timeoutId = setTimeout(() => {
       setGameReadyFlag(false);
-      next();
+      next(-1);
     }, 2000);
 
     return () => {
@@ -1524,12 +1529,8 @@ const DropBrock = () => {
   }, [handleKeyFunction]);
 
   useEffect(() => {
-    next();
-  }, []);
-
-  useEffect(() => {
     const timeoutId = setTimeout(() => {
-      if (!gameReadyFlag) {
+      if (!gameReadyFlag && gameStatus === 2) {
         if (hp <= 0) {
           if (!secretFlag && selectLevel === 4) {
             // secret第二スタート
