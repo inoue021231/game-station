@@ -383,7 +383,7 @@ const Tetris = () => {
           }
         } else if (k === 39) {
           if (selectLevel >= 0 && selectLevel <= 2) {
-            if (!secretFlag && selectLevel !== 1) {
+            if (!(!secretFlag && selectLevel === 1)) {
               setSelectLevel((prevLevel) => prevLevel + 3);
             }
           } else if (selectLevel === -1) {
@@ -1180,9 +1180,24 @@ const Tetris = () => {
             */}
             <g transform="translate(0,-70)">
               <g transform="translate(10,150)">
-                <image href={EASY_ENEMY} y="0" width={100} height={100} />
-                <image href={NORMAL_ENEMY} y="150" width={100} height={100} />
-                <image href={HARD_ENEMY} y="300" width={100} height={100} />
+                <image
+                  href={EASY_ENEMY}
+                  y={selectLevel === 0 ? -10 : 0}
+                  width={100}
+                  height={100}
+                />
+                <image
+                  href={NORMAL_ENEMY}
+                  y={selectLevel === 1 ? 140 : 150}
+                  width={100}
+                  height={100}
+                />
+                <image
+                  href={HARD_ENEMY}
+                  y={selectLevel === 2 ? 290 : 300}
+                  width={100}
+                  height={100}
+                />
               </g>
               <g transform="translate(150, 210)" fill="white" fontSize="30">
                 <text
@@ -1219,16 +1234,26 @@ const Tetris = () => {
               </g>
 
               <g transform="translate(300,150)">
-                <image href={EXPERT_ENEMY} y="0" width={100} height={100} />
+                <image
+                  href={EXPERT_ENEMY}
+                  y={selectLevel === 3 ? -10 : 0}
+                  width={100}
+                  height={100}
+                />
                 {secretFlag && (
                   <image
                     href={SECRET1_ENEMY}
-                    y="150"
+                    y={selectLevel === 4 ? 140 : 150}
                     width={100}
                     height={100}
                   />
                 )}
-                <image href={ENDLESS_ENEMY} y="300" width={100} height={100} />
+                <image
+                  href={ENDLESS_ENEMY}
+                  y={selectLevel === 5 ? 290 : 300}
+                  width={100}
+                  height={100}
+                />
               </g>
               <g transform="translate(440,210)" fill="white" fontSize="30">
                 <text
