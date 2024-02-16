@@ -8,8 +8,8 @@ const Tetris = () => {
   const X0 = 210;
   const Y0 = 240;
 
-  const MAX_HP = [3, 5, 7, 12, 10, 15];
-  const ATTACK_COUNT = [7, 5, 4, 3, 5, 2];
+  const MAX_HP = [3, 5, 7, 12, 10, 15, 999999];
+  const ATTACK_COUNT = [7, 5, 4, 3, 5, 2, 999999];
 
   const MINO = [
     // Imino
@@ -267,8 +267,6 @@ const Tetris = () => {
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
   ]);
 
-  const [timer, setTimer] = useState(0);
-
   const [x, setX] = useState(4);
   const [y, setY] = useState(0);
   const [rotStatus, setRotStatus] = useState(0);
@@ -316,7 +314,6 @@ const Tetris = () => {
   const handleKeyFunction = (event, button) => {
     const k = event ? event.keyCode : button;
     const secretFlag = clearStages.filter((item) => !item).length === 0;
-
     let dx = 4;
     let dy = 0;
     let rot = 0;
@@ -344,7 +341,10 @@ const Tetris = () => {
             setSelectChara(true);
           } else if (selectLevel === -1) {
             setSelectHowto(true);
-          } else if (selectLevel !== 5) {
+          } else {
+            if (selectLevel === 5) {
+              setSelectLevel(6);
+            }
             setGameStatus(2);
           }
         } else if (k === 27) {
@@ -401,6 +401,8 @@ const Tetris = () => {
       }
     } else {
       if (k === 27 && !gameReadyFlag) {
+        setGameClearFlag(false);
+        setGameOverFlag(false);
         setGameStatus(1);
       }
     }
@@ -879,7 +881,7 @@ const Tetris = () => {
               height={200}
             ></image>
           );
-        case 5:
+        case 6:
           return <image href={ENDLESS_ENEMY} width={100} height={100}></image>;
       }
     };
@@ -1205,6 +1207,7 @@ const Tetris = () => {
                   width={100}
                   height={100}
                 />
+
                 <image
                   href={NORMAL_ENEMY}
                   y={selectLevel === 1 ? 140 : 150}
@@ -1217,6 +1220,17 @@ const Tetris = () => {
                   width={100}
                   height={100}
                 />
+                <g transform="translate(90,0)">
+                  {clearStages[0] && (
+                    <image href={CLEAR_MARK} y={90} width={20} height={20} />
+                  )}
+                  {clearStages[1] && (
+                    <image href={CLEAR_MARK} y={240} width={20} height={20} />
+                  )}
+                  {clearStages[2] && (
+                    <image href={CLEAR_MARK} y={390} width={20} height={20} />
+                  )}
+                </g>
               </g>
               <g transform="translate(150, 210)" fill="white" fontSize="30">
                 <text
@@ -1273,6 +1287,11 @@ const Tetris = () => {
                   width={100}
                   height={100}
                 />
+                <g transform="translate(90,0)">
+                  {clearStages[3] && (
+                    <image href={CLEAR_MARK} y={90} width={20} height={20} />
+                  )}
+                </g>
               </g>
               <g transform="translate(440,210)" fill="white" fontSize="30">
                 <text
@@ -1423,11 +1442,12 @@ const Tetris = () => {
         {!gameClearFlag && (
           <g>
             <DrawEnemy></DrawEnemy>
-            <DrawHp></DrawHp>
+
+            {selectLevel !== 6 && <DrawHp></DrawHp>}
           </g>
         )}
 
-        <DrawAttack></DrawAttack>
+        {selectLevel !== 6 && <DrawAttack></DrawAttack>}
         <DrawSkill></DrawSkill>
 
         {gameReadyFlag && <DrawReady></DrawReady>}
@@ -1511,6 +1531,9 @@ const Tetris = () => {
             // secret第二スタート
           } else {
             //ゲームクリア
+            setClearStages(
+              clearStages.map((item, i) => (i === selectLevel ? true : item))
+            );
             setGameClearFlag(true);
           }
         } else if (canMove(x, y, rotStatus)) {
