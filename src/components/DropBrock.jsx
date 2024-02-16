@@ -403,8 +403,14 @@ const DropBrock = () => {
       }
     } else {
       if (k === 27 && !gameReadyFlag) {
+        if (selectLevel === 6) {
+          setSelectLevel(5);
+        } else if (selectLevel === 5 && secretFlag) {
+          setSelectLevel(4);
+        }
         setGameClearFlag(false);
         setGameOverFlag(false);
+        setSecretFlag(false);
         setGameStatus(1);
       }
     }
@@ -875,9 +881,9 @@ const DropBrock = () => {
         case 3:
           return <image href={EXPERT_ENEMY} width={100} height={100}></image>;
         case 4:
-          return !secretFlag ? (
-            <image href={SECRET1_ENEMY} width={100} height={100}></image>
-          ) : (
+          return <image href={SECRET1_ENEMY} width={100} height={100}></image>;
+        case 5:
+          return (
             <image
               href={SECRET2_ENEMY}
               x={-BLOCK_SIZE * 3 - 5}
@@ -1076,30 +1082,77 @@ const DropBrock = () => {
   const DrawGameclear = () => {
     return (
       <g transform={`translate(${X0 + BLOCK_SIZE * 2},${Y0 + BLOCK_SIZE * 8})`}>
-        <rect
-          x={0}
-          y={0}
-          width={BLOCK_SIZE * 8}
-          height={BLOCK_SIZE * 4}
-          fill="black"
-          stroke="white"
-        ></rect>
-        <text
-          x={BLOCK_SIZE * 0.25}
-          y={BLOCK_SIZE * 1.5}
-          fontSize="20"
-          fill="white"
-        >
-          GameClear!
-        </text>
-        <text
-          x={BLOCK_SIZE * 1.5}
-          y={BLOCK_SIZE * 3.5}
-          fontSize={BLOCK_SIZE}
-          fill="white"
-        >
-          Press Esc
-        </text>
+        {secretFlag ? (
+          <g>
+            <rect
+              x={0}
+              y={0}
+              width={BLOCK_SIZE * 8}
+              height={BLOCK_SIZE * 6}
+              fill="black"
+              stroke="white"
+            ></rect>
+            <text
+              x={BLOCK_SIZE * 0.25}
+              y={BLOCK_SIZE * 1.5}
+              fontSize="20"
+              fill="white"
+            >
+              GameClear!
+            </text>
+            <text
+              x={BLOCK_SIZE * 0.75}
+              y={BLOCK_SIZE * 3}
+              fontSize={BLOCK_SIZE}
+              fill="white"
+            >
+              THANK YOU
+            </text>
+            <text
+              x={BLOCK_SIZE * 0.75}
+              y={BLOCK_SIZE * 4.25}
+              fontSize={BLOCK_SIZE}
+              fill="white"
+            >
+              FOR PLAYING!
+            </text>
+            <text
+              x={BLOCK_SIZE * 1.5}
+              y={BLOCK_SIZE * 5.5}
+              fontSize={BLOCK_SIZE}
+              fill="white"
+            >
+              Press Esc
+            </text>
+          </g>
+        ) : (
+          <g>
+            <rect
+              x={0}
+              y={0}
+              width={BLOCK_SIZE * 8}
+              height={BLOCK_SIZE * 4}
+              fill="black"
+              stroke="white"
+            ></rect>
+            <text
+              x={BLOCK_SIZE * 0.25}
+              y={BLOCK_SIZE * 1.5}
+              fontSize="20"
+              fill="white"
+            >
+              GameClear!
+            </text>
+            <text
+              x={BLOCK_SIZE * 1.5}
+              y={BLOCK_SIZE * 3.5}
+              fontSize={BLOCK_SIZE}
+              fill="white"
+            >
+              Press Esc
+            </text>
+          </g>
+        )}
       </g>
     );
   };
@@ -1485,7 +1538,6 @@ const DropBrock = () => {
       setTspinFlag(false);
       setRenFlag(false);
       setBtbFlag(false);
-      setSecretFlag(false);
       setBlockStatus([
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -1520,7 +1572,7 @@ const DropBrock = () => {
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [gameStatus]);
+  }, [gameStatus, secretFlag]);
 
   useEffect(() => {
     document.addEventListener("keydown", handleKeyFunction);
@@ -1534,7 +1586,8 @@ const DropBrock = () => {
       if (!gameReadyFlag && gameStatus === 2) {
         if (hp <= 0) {
           if (!secretFlag && selectLevel === 4) {
-            // secret第二スタート
+            setSecretFlag(true);
+            setSelectLevel(5);
           } else {
             //ゲームクリア
             setClearStages(
@@ -1553,7 +1606,7 @@ const DropBrock = () => {
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [y, canMove]);
+  }, [y, canMove, hp]);
 
   return (
     <Gamepad
