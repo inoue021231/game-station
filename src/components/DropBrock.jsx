@@ -1,6 +1,18 @@
 import { useState, useEffect } from "react";
 import Gamepad from "react-gamepad";
 
+import CLEAR_MARK from "./../assets/crown.png";
+import EASY_ENEMY from "./../assets/slime.png";
+import NORMAL_ENEMY from "./../assets/mummy.png";
+import HARD_ENEMY from "./../assets/devil.png";
+import EXPERT_ENEMY from "./../assets/shinigami.png";
+import SECRET1_ENEMY from "./../assets/mao.png";
+import SECRET2_ENEMY from "./../assets/dragon.png";
+import ENDLESS_ENEMY from "./../assets/heishi.png";
+import CHARA_YUSHA from "./../assets/yusha.png";
+import CHARA_SENSHI from "./../assets/senshi.png";
+import CHARA_MAHOTSUKAI from "./../assets/mahotsukai.png";
+
 const DropBrock = () => {
   const FIELD_WIDTH = 12;
   const FIELD_HEIGHT = 23;
@@ -215,30 +227,6 @@ const DropBrock = () => {
     "orange",
     "dimgray",
   ];
-
-  const CLEAR_MARK =
-    "https://github.com/inoue021231/game-station/blob/main/src/assets/crown.png?raw=true";
-  const EASY_ENEMY =
-    "https://github.com/inoue021231/game-station/blob/main/src/assets/slime.png?raw=true";
-  const NORMAL_ENEMY =
-    "https://github.com/inoue021231/game-station/blob/main/src/assets/mummy.png?raw=true";
-  const HARD_ENEMY =
-    "https://github.com/inoue021231/game-station/blob/main/src/assets/devil.png?raw=true";
-  const EXPERT_ENEMY =
-    "https://github.com/inoue021231/game-station/blob/main/src/assets/shinigami.png?raw=true";
-  const SECRET1_ENEMY =
-    "https://github.com/inoue021231/game-station/blob/main/src/assets/mao.png?raw=true";
-  const SECRET2_ENEMY =
-    "https://github.com/inoue021231/game-station/blob/main/src/assets/dragon.png?raw=true";
-  const ENDLESS_ENEMY =
-    "https://github.com/inoue021231/game-station/blob/main/src/assets/heishi.png?raw=true";
-
-  const CHARA_YUSHA =
-    "https://github.com/inoue021231/game-station/blob/main/src/assets/yusha.png?raw=true";
-  const CHARA_SENSHI =
-    "https://github.com/inoue021231/game-station/blob/main/src/assets/senshi.png?raw=true";
-  const CHARA_MAHOTSUKAI =
-    "https://github.com/inoue021231/game-station/blob/main/src/assets/mahotsukai.png?raw=true";
 
   const canvasWidth = FIELD_WIDTH * BLOCK_SIZE;
   const canvasHeight = FIELD_HEIGHT * BLOCK_SIZE;
