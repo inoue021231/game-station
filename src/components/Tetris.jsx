@@ -322,54 +322,67 @@ const Tetris = () => {
         setGameStatus(1);
       }
     } else if (gameStatus === 1) {
-      if (k === 13) {
-        if (selectLevel === -2) {
-          // setSelectChara(true);
-          console.log("selectchara");
-        } else if (selectLevel === -1) {
-          console.log("howtoplay");
-        } else if (selectLevel !== 5) {
-          setGameStatus(2);
+      if (selectChara) {
+        if (k === 13 || k === 27) {
+          setSelectChara(false);
+        } else if ((charaIdx === 1 || charaIdx === 2) && k === 37) {
+          setCharaIdx((prevIdx) => prevIdx - 1);
+        } else if ((charaIdx === 0 || charaIdx === 1) && k === 39) {
+          setCharaIdx((prevIdx) => prevIdx + 1);
         }
-      } else if (k === 27) {
-        setGameStatus(0);
-      } else if (k === 40) {
-        if (
-          selectLevel === 0 ||
-          selectLevel === 1 ||
-          selectLevel === 3 ||
-          selectLevel === 4
-        ) {
-          setSelectLevel((prevLevel) => prevLevel + 1);
-        } else if (selectLevel === 2) {
-          setSelectLevel(-1);
-        } else if (selectLevel === 5) {
-          setSelectLevel(-2);
+      } else if (selectHowto) {
+        if (k === 13 || k === 27) {
+          setSelectHowto(false);
         }
-      } else if (k === 38) {
-        if (
-          selectLevel === 1 ||
-          selectLevel === 2 ||
-          selectLevel === 4 ||
-          selectLevel === 5
-        ) {
-          setSelectLevel((prevLevel) => prevLevel - 1);
-        } else if (selectLevel === -1) {
-          setSelectLevel(2);
-        } else if (selectLevel === -2) {
-          setSelectLevel(5);
-        }
-      } else if (k === 39) {
-        if (selectLevel >= 0 && selectLevel <= 2) {
-          setSelectLevel((prevLevel) => prevLevel + 3);
-        } else if (selectLevel === -1) {
-          setSelectLevel(-2);
-        }
-      } else if (k === 37) {
-        if (selectLevel >= 3 && selectLevel <= 5) {
-          setSelectLevel((prevLevel) => prevLevel - 3);
-        } else if (selectLevel === -2) {
-          setSelectLevel(-1);
+      } else {
+        if (k === 13) {
+          if (selectLevel === -2) {
+            setSelectChara(true);
+          } else if (selectLevel === -1) {
+            setSelectHowto(true);
+          } else if (selectLevel !== 5) {
+            setGameStatus(2);
+          }
+        } else if (k === 27) {
+          setGameStatus(0);
+        } else if (k === 40) {
+          if (
+            selectLevel === 0 ||
+            selectLevel === 1 ||
+            selectLevel === 3 ||
+            selectLevel === 4
+          ) {
+            setSelectLevel((prevLevel) => prevLevel + 1);
+          } else if (selectLevel === 2) {
+            setSelectLevel(-1);
+          } else if (selectLevel === 5) {
+            setSelectLevel(-2);
+          }
+        } else if (k === 38) {
+          if (
+            selectLevel === 1 ||
+            selectLevel === 2 ||
+            selectLevel === 4 ||
+            selectLevel === 5
+          ) {
+            setSelectLevel((prevLevel) => prevLevel - 1);
+          } else if (selectLevel === -1) {
+            setSelectLevel(2);
+          } else if (selectLevel === -2) {
+            setSelectLevel(5);
+          }
+        } else if (k === 39) {
+          if (selectLevel >= 0 && selectLevel <= 2) {
+            setSelectLevel((prevLevel) => prevLevel + 3);
+          } else if (selectLevel === -1) {
+            setSelectLevel(-2);
+          }
+        } else if (k === 37) {
+          if (selectLevel >= 3 && selectLevel <= 5) {
+            setSelectLevel((prevLevel) => prevLevel - 3);
+          } else if (selectLevel === -2) {
+            setSelectLevel(-1);
+          }
         }
       }
     } else {
@@ -1126,8 +1139,8 @@ const Tetris = () => {
   const DrawSelect = () => {
     return (
       <g>
-        {selectHowto && <g></g>}
-        {selectChara && <g></g>}
+        {selectHowto && <DrawSelectHowto></DrawSelectHowto>}
+        {selectChara && <DrawSelectChara></DrawSelectChara>}
         {!selectHowto && !selectChara && (
           <g>
             <text
@@ -1239,6 +1252,86 @@ const Tetris = () => {
               strokeDasharray="15"
             ></line>
           </g>
+        )}
+      </g>
+    );
+  };
+
+  const DrawSelectHowto = () => {
+    return (
+      <g transform="translate(150,0)" fill="white">
+        <text y={100} fontSize={40}>
+          HOW TO PLAY
+        </text>
+        <text x={80} y={200}>
+          ← → : MOVE
+        </text>
+        <text x={80} y={230}>
+          ↑ : DIVE
+        </text>
+        <text x={80} y={260}>
+          ↓ : DROP
+        </text>
+        <text x={80} y={290}>
+          D : RIGHT SPIN
+        </text>
+        <text x={80} y={320}>
+          A : LEFT SPIN
+        </text>
+        <text x={80} y={350}>
+          S : HOLD
+        </text>
+        <text x={80} y={380}>
+          Q : SKILL
+        </text>
+      </g>
+    );
+  };
+
+  const DrawSelectChara = () => {
+    return (
+      <g>
+        <text x={150} y={100} fill="white" fontSize={40}>
+          SELECT CHARA
+        </text>
+        <image
+          href={CHARA_YUSHA}
+          x={100}
+          y={charaIdx === 0 ? 130 : 150}
+          width={100}
+          height={100}
+        />
+        <image
+          href={CHARA_SENSHI}
+          x={250}
+          y={charaIdx === 1 ? 130 : 150}
+          width={100}
+          height={100}
+        />
+        <image
+          href={CHARA_MAHOTSUKAI}
+          x={400}
+          y={charaIdx === 2 ? 130 : 150}
+          width={100}
+          height={100}
+        />
+        <text x={100} y={400} fill="white" fontSize={30}>
+          SKILL :
+        </text>
+        {charaIdx === 0 && (
+          <text x={220} y={400} fill="white" fontSize={30}>
+            DELETE LINE
+          </text>
+        )}
+        {charaIdx === 1 && (
+          <text x={220} y={400} fill="white" fontSize={30}>
+            ATTACK ENEMY
+          </text>
+        )}
+        {charaIdx === 2 && (
+          <text x={220} y={400} fill="white" fontSize={30}>
+            DELAY TURN
+          </text>
         )}
       </g>
     );
