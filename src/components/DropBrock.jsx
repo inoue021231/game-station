@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import Gamepad from "react-gamepad";
 
-const Tetris = () => {
+const DropBrock = () => {
   const FIELD_WIDTH = 12;
-  const FIELD_HEIGHT = 21;
+  const FIELD_HEIGHT = 23;
   const BLOCK_SIZE = 15;
   const X0 = 210;
   const Y0 = 240;
@@ -244,6 +244,8 @@ const Tetris = () => {
   const canvasHeight = FIELD_HEIGHT * BLOCK_SIZE;
 
   const [minoStatus, setMinoStatus] = useState([
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -1147,7 +1149,7 @@ const Tetris = () => {
     return (
       <g>
         <text x={125} y={100} fill="white" fontSize={50}>
-          TETRIS QUEST
+          BLOCK QUEST
         </text>
         <image href={CHARA_YUSHA} x="100" y="150" width={100} height={100} />
         <image href={CHARA_SENSHI} x="250" y="150" width={100} height={100} />
@@ -1432,8 +1434,8 @@ const Tetris = () => {
 
         {!gameReadyFlag && (
           <g>
-            <DrawMino></DrawMino>
             <DrawForecast></DrawForecast>
+            <DrawMino></DrawMino>
           </g>
         )}
 
@@ -1479,6 +1481,8 @@ const Tetris = () => {
       setBtbFlag(false);
       setSecretFlag(false);
       setMinoStatus([
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -1617,4 +1621,4 @@ const Tetris = () => {
   );
 };
 
-export default Tetris;
+export default DropBrock;

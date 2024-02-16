@@ -1,8 +1,8 @@
-import Tetris from "./components/Tetris";
+import DropBrock from "./components/DropBrock";
 import "./app.css";
 
 const App = () => {
-  return <Tetris></Tetris>;
+  return <DropBrock></DropBrock>;
 };
 
 export default App;
