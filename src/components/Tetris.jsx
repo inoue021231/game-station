@@ -275,6 +275,7 @@ const Tetris = () => {
   const [selectHowto, setSelectHowto] = useState(false);
   const [charaIdx, setCharaIdx] = useState(0);
   const [skillCount, setSkillCount] = useState(5);
+  const [clearStages, setClearStages] = useState([true, true, true, true]);
   const [hp, setHp] = useState(MAX_HP[selectLevel]);
   const [ren, setRen] = useState(0);
   const [atCount, setAtCount] = useState(ATTACK_COUNT[selectLevel]);
@@ -312,6 +313,7 @@ const Tetris = () => {
 
   const handleKeyFunction = (event, button) => {
     const k = event ? event.keyCode : button;
+    const secretFlag = clearStages.filter((item) => !item).length === 0;
 
     let dx = 4;
     let dy = 0;
@@ -352,7 +354,11 @@ const Tetris = () => {
             selectLevel === 3 ||
             selectLevel === 4
           ) {
-            setSelectLevel((prevLevel) => prevLevel + 1);
+            if (!secretFlag && selectLevel === 3) {
+              setSelectLevel(5);
+            } else {
+              setSelectLevel((prevLevel) => prevLevel + 1);
+            }
           } else if (selectLevel === 2) {
             setSelectLevel(-1);
           } else if (selectLevel === 5) {
@@ -365,7 +371,11 @@ const Tetris = () => {
             selectLevel === 4 ||
             selectLevel === 5
           ) {
-            setSelectLevel((prevLevel) => prevLevel - 1);
+            if (!secretFlag && selectLevel === 5) {
+              setSelectLevel(3);
+            } else {
+              setSelectLevel((prevLevel) => prevLevel - 1);
+            }
           } else if (selectLevel === -1) {
             setSelectLevel(2);
           } else if (selectLevel === -2) {
@@ -373,7 +383,9 @@ const Tetris = () => {
           }
         } else if (k === 39) {
           if (selectLevel >= 0 && selectLevel <= 2) {
-            setSelectLevel((prevLevel) => prevLevel + 3);
+            if (!secretFlag && selectLevel !== 1) {
+              setSelectLevel((prevLevel) => prevLevel + 3);
+            }
           } else if (selectLevel === -1) {
             setSelectLevel(-2);
           }
@@ -1137,6 +1149,8 @@ const Tetris = () => {
   };
 
   const DrawSelect = () => {
+    const secretFlag = clearStages.filter((item) => !item).length === 0;
+
     return (
       <g>
         {selectHowto && <DrawSelectHowto></DrawSelectHowto>}
@@ -1206,7 +1220,14 @@ const Tetris = () => {
 
               <g transform="translate(300,150)">
                 <image href={EXPERT_ENEMY} y="0" width={100} height={100} />
-                <image href={SECRET1_ENEMY} y="150" width={100} height={100} />
+                {secretFlag && (
+                  <image
+                    href={SECRET1_ENEMY}
+                    y="150"
+                    width={100}
+                    height={100}
+                  />
+                )}
                 <image href={ENDLESS_ENEMY} y="300" width={100} height={100} />
               </g>
               <g transform="translate(440,210)" fill="white" fontSize="30">
@@ -1217,14 +1238,17 @@ const Tetris = () => {
                 >
                   EXPERT
                 </text>
-                <text
-                  x="0"
-                  y="150"
-                  fill="yellow"
-                  style={{ textDecoration: selectLevel === 4 && "underline" }}
-                >
-                  SECRET
-                </text>
+                {secretFlag && (
+                  <text
+                    x="0"
+                    y="150"
+                    fill="yellow"
+                    style={{ textDecoration: selectLevel === 4 && "underline" }}
+                  >
+                    SECRET
+                  </text>
+                )}
+
                 <text
                   x="-10"
                   y="300"
