@@ -429,8 +429,9 @@ const DropBrock = () => {
           setHoldFlag(true);
           setTspinFlag(false);
 
-          setupField(dy);
-          deleteLine();
+          const attackStatus = attack();
+          const newStatus = setupField(attackStatus, dy - (atCount === 0 && 1));
+          deleteLine(newStatus);
           newBlock(-1);
         } else if (k === 40) {
           dy++;
@@ -472,13 +473,14 @@ const DropBrock = () => {
     }
   };
 
-  const setupField = (dy = 0) => {
+  const setupField = (newStatus, dy = 0) => {
     const block = BLOCK[blockIdx][rotStatus];
-    let newBlockStatus = [...blockStatus];
+    let newBlockStatus = [...newStatus];
     block.forEach((m) => {
       newBlockStatus[dy === 0 ? y + m[1] : dy + m[1]][x + m[0]] = blockIdx + 2;
     });
     setBlockStatus(newBlockStatus);
+    return newBlockStatus;
   };
 
   const next = (index = 0) => {
@@ -527,11 +529,12 @@ const DropBrock = () => {
   };
 
   const attack = () => {
+    const newStatus = [...blockStatus];
     if (atCount === 0) {
       let at = [1, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 1];
       const randomIndex = Math.floor(Math.random() * 10);
       at[randomIndex + 1] = 0;
-      const newStatus = [...blockStatus];
+
       newStatus.splice(0, 1);
       newStatus.splice(FIELD_HEIGHT - 2, 0, at);
       setBlockStatus(newStatus);
@@ -539,6 +542,7 @@ const DropBrock = () => {
     } else {
       setAtCount((prevCount) => prevCount - 1);
     }
+    return newStatus;
   };
 
   const skill = () => {
@@ -562,8 +566,8 @@ const DropBrock = () => {
     }
   };
 
-  const deleteLine = () => {
-    let newBlockStatus = [...blockStatus];
+  const deleteLine = (newStatus) => {
+    let newBlockStatus = [...newStatus];
     let lineCount = 0;
     let damage = 0;
     let perfectFlag = true;
@@ -655,7 +659,7 @@ const DropBrock = () => {
     }
     setBlockStatus(newBlockStatus);
     setHp((prevHp) => prevHp - damage);
-
+    return newBlockStatus;
     // damage_sound.play()
   };
 
@@ -669,10 +673,6 @@ const DropBrock = () => {
     } else {
       setBlockIdx(index);
     }
-
-    if (holdFlag) {
-      attack();
-    }
   };
 
   const downCheck = () => {
@@ -682,8 +682,9 @@ const DropBrock = () => {
       setHoldFlag(true);
       setTspinFlag(false);
 
-      setupField();
-      deleteLine();
+      const attackStatus = attack();
+      const newStatus = setupField(attackStatus, -(atCount === 0 && 1));
+      deleteLine(newStatus);
       newBlock(-1);
     }
   };
