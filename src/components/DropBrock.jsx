@@ -494,6 +494,13 @@ const DropBrock = () => {
         setGameStatus(1);
         setHp(0);
         cancelSoundPlay();
+        easyBgmStop();
+        normalBgmStop();
+        hardBgmStop();
+        expertBgmStop();
+        secret1BgmStop();
+        secret2BgmStop();
+        endlessBgmStop();
         gameclearBgmStop();
         gameoverBgmStop();
         menuBgmPlay();
