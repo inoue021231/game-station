@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Gamepad from "react-gamepad";
+import useSound from "use-sound";
 
 import CLEAR_MARK from "./../assets/crown.png";
 import EASY_ENEMY from "./../assets/slime.png";
@@ -12,6 +13,27 @@ import ENDLESS_ENEMY from "./../assets/heishi.png";
 import CHARA_YUSHA from "./../assets/yusha.png";
 import CHARA_SENSHI from "./../assets/senshi.png";
 import CHARA_MAHOTSUKAI from "./../assets/mahotsukai.png";
+
+import EASY_BGM from "./../assets/easy.mp3";
+import NORMAL_BGM from "./../assets/normal.mp3";
+import HARD_BGM from "./../assets/hard.mp3";
+import EXPERT_BGM from "./../assets/expert.mp3";
+import SECRET1_BGM from "./../assets/secret1.mp3";
+import SECRET2_BGM from "./../assets/secret2.mp3";
+import ENDLESS_BGM from "./../assets/endless.mp3";
+import MENU_BGM from "./../assets/menu.mp3";
+import GAMECLEAR_BGM from "./../assets/gameclear.mp3";
+import GAMEOVER_BGM from "./../assets/gameover.mp3";
+
+import CANCEL_SOUND from "./../assets/cancel.mp3";
+import DAMAGE_SOUND from "./../assets/damage.mp3";
+import HOLD_SOUND from "./../assets/hold.mp3";
+import MOVE_SOUND from "./../assets/move.mp3";
+import SELECT_SOUND from "./../assets/select.mp3";
+import SKILL_SOUND from "./../assets/skill.mp3";
+import TSPIN_SOUND from "./../assets/tspin.mp3";
+import UP_SOUND from "./../assets/up.mp3";
+import ATTACK_SOUND from "./../assets/attack.mp3";
 
 const DropBrock = () => {
   const FIELD_WIDTH = 12;
@@ -285,6 +307,50 @@ const DropBrock = () => {
   const [tspinFlag, setTspinFlag] = useState(false);
   const [secretFlag, setSecretFlag] = useState(false);
 
+  const [easyBgmPlay, { stop: easyBgmStop }] = useSound(EASY_BGM, {
+    loop: true,
+  });
+  const [normalBgmPlay, { stop: normalBgmStop }] = useSound(NORMAL_BGM, {
+    loop: true,
+  });
+  const [hardBgmPlay, { stop: hardBgmStop }] = useSound(HARD_BGM, {
+    loop: true,
+  });
+  const [expertBgmPlay, { stop: expertBgmStop }] = useSound(EXPERT_BGM, {
+    loop: true,
+  });
+  const [secret1BgmPlay, { stop: secret1BgmStop }] = useSound(SECRET1_BGM, {
+    loop: true,
+  });
+  const [secret2BgmPlay, { stop: secret2BgmStop }] = useSound(SECRET2_BGM, {
+    loop: true,
+  });
+  const [endlessBgmPlay, { stop: endlessBgmStop }] = useSound(ENDLESS_BGM, {
+    loop: true,
+  });
+  const [menuBgmPlay, { stop: menuBgmStop }] = useSound(MENU_BGM, {
+    loop: true,
+  });
+  const [gameclearBgmPlay, { stop: gameclearBgmStop }] = useSound(
+    GAMECLEAR_BGM,
+    {
+      loop: true,
+    }
+  );
+  const [gameoverBgmPlay, { stop: gameoverBgmStop }] = useSound(GAMEOVER_BGM, {
+    loop: true,
+  });
+
+  const [cancelSoundPlay, { stop: cancelSoundStop }] = useSound(CANCEL_SOUND);
+  const [damageSoundPlay, { stop: damageSoundStop }] = useSound(DAMAGE_SOUND);
+  const [holdSoundPlay, { stop: holdSoundStop }] = useSound(HOLD_SOUND);
+  const [moveSoundPlay, { stop: moveSoundStop }] = useSound(MOVE_SOUND);
+  const [selectSoundPlay, { stop: selectSoundStop }] = useSound(SELECT_SOUND);
+  const [skillSoundPlay, { stop: skillSoundStop }] = useSound(SKILL_SOUND);
+  const [tspinSoundPlay, { stop: tspinSoundStop }] = useSound(TSPIN_SOUND);
+  const [upSoundPlay, { stop: upSoundStop }] = useSound(UP_SOUND);
+  const [attackSoundPlay, { stop: attackSoundStop }] = useSound(ATTACK_SOUND);
+
   const canMove = (dx, dy, rot) => {
     const block = BLOCK[blockIdx][rot];
     return !block.find((m) => blockStatus[dy + m[1]][dx + m[0]] >= 1);
@@ -308,22 +374,35 @@ const DropBrock = () => {
     let dy = 0;
     let rot = 0;
 
+    if (k === 13 && gameStatus !== 2) {
+      selectSoundPlay();
+    }
+
     if (gameStatus === 0) {
       if (k === 13) {
         setGameStatus(1);
+        menuBgmPlay();
       }
     } else if (gameStatus === 1) {
       if (selectChara) {
         if (k === 13 || k === 27) {
           setSelectChara(false);
+          if (k === 27) {
+            cancelSoundPlay();
+          }
         } else if ((charaIdx === 1 || charaIdx === 2) && k === 37) {
+          moveSoundPlay();
           setCharaIdx((prevIdx) => prevIdx - 1);
         } else if ((charaIdx === 0 || charaIdx === 1) && k === 39) {
+          moveSoundPlay();
           setCharaIdx((prevIdx) => prevIdx + 1);
         }
       } else if (selectHowto) {
         if (k === 13 || k === 27) {
           setSelectHowto(false);
+          if (k === 27) {
+            cancelSoundPlay();
+          }
         }
       } else {
         if (k === 13) {
@@ -336,9 +415,12 @@ const DropBrock = () => {
               setSelectLevel(6);
             }
             setGameStatus(2);
+            menuBgmStop();
           }
         } else if (k === 27) {
           setGameStatus(0);
+          menuBgmStop();
+          cancelSoundPlay();
         } else if (k === 40) {
           if (
             selectLevel === 0 ||
@@ -351,10 +433,13 @@ const DropBrock = () => {
             } else {
               setSelectLevel((prevLevel) => prevLevel + 1);
             }
+            moveSoundPlay();
           } else if (selectLevel === 2) {
             setSelectLevel(-1);
+            moveSoundPlay();
           } else if (selectLevel === 5) {
             setSelectLevel(-2);
+            moveSoundPlay();
           }
         } else if (k === 38) {
           if (
@@ -368,24 +453,31 @@ const DropBrock = () => {
             } else {
               setSelectLevel((prevLevel) => prevLevel - 1);
             }
+            moveSoundPlay();
           } else if (selectLevel === -1) {
             setSelectLevel(2);
+            moveSoundPlay();
           } else if (selectLevel === -2) {
             setSelectLevel(5);
+            moveSoundPlay();
           }
         } else if (k === 39) {
           if (selectLevel >= 0 && selectLevel <= 2) {
             if (!(!secretFlag && selectLevel === 1)) {
               setSelectLevel((prevLevel) => prevLevel + 3);
+              moveSoundPlay();
             }
           } else if (selectLevel === -1) {
             setSelectLevel(-2);
+            moveSoundPlay();
           }
         } else if (k === 37) {
           if (selectLevel >= 3 && selectLevel <= 5) {
             setSelectLevel((prevLevel) => prevLevel - 3);
+            moveSoundPlay();
           } else if (selectLevel === -2) {
             setSelectLevel(-1);
+            moveSoundPlay();
           }
         }
       }
@@ -400,6 +492,11 @@ const DropBrock = () => {
         setGameOverFlag(false);
         setSecretFlag(false);
         setGameStatus(1);
+        setHp(0);
+        cancelSoundPlay();
+        gameclearBgmStop();
+        gameoverBgmStop();
+        menuBgmPlay();
       }
     }
 
@@ -423,6 +520,8 @@ const DropBrock = () => {
           setHoldFlag(true);
           setTspinFlag(false);
 
+          upSoundPlay();
+
           const attackStatus = attack();
           const newStatus = setupField(attackStatus, dy - (atCount === 0 && 1));
           deleteLine(newStatus);
@@ -437,16 +536,17 @@ const DropBrock = () => {
           if (rot === 4) rot = 0;
         } else if (k === 83) {
           if (holdFlag) {
-            // hold.sound()
             setHoldFlag(false);
             hold();
             dx = 4;
             dy = 0;
             rot = 0;
+            holdSoundPlay();
           }
         } else if (k === 81 && skillCount === 0) {
           skill();
           setSkillCount(5);
+          skillSoundPlay();
         }
       }
 
@@ -461,7 +561,7 @@ const DropBrock = () => {
           k != 38 &&
           k != 83
         ) {
-          // move_sound.play()
+          moveSoundPlay();
         }
       }
     }
@@ -531,6 +631,7 @@ const DropBrock = () => {
 
       newStatus.splice(0, 1);
       newStatus.splice(FIELD_HEIGHT - 2, 0, at);
+      attackSoundPlay();
       setBlockStatus(newStatus);
       setAtCount(ATTACK_COUNT[selectLevel]);
     } else {
@@ -653,8 +754,10 @@ const DropBrock = () => {
     }
     setBlockStatus(newBlockStatus);
     setHp((prevHp) => prevHp - damage);
+    if (damage > 0) {
+      damageSoundPlay();
+    }
     return newBlockStatus;
-    // damage_sound.play()
   };
 
   const newBlock = (index) => {
@@ -1229,7 +1332,7 @@ const DropBrock = () => {
           <g>
             <text
               x="590"
-              y="10"
+              y="30"
               fontSize="20"
               dominantBaseline="Hanging"
               textAnchor="end"
@@ -1237,7 +1340,7 @@ const DropBrock = () => {
             >
               illust:DOT ILLUST
             </text>
-            {/* <text
+            <text
               x="590"
               y="10"
               fontSize="20"
@@ -1247,7 +1350,7 @@ const DropBrock = () => {
             >
               music:魔王魂
             </text>
-            */}
+
             <g transform="translate(0,-70)">
               <g transform="translate(10,150)">
                 <image
@@ -1553,8 +1656,33 @@ const DropBrock = () => {
       ]);
     }
     const timeoutId = setTimeout(() => {
-      setGameReadyFlag(false);
-      next(-1);
+      if (gameStatus === 2) {
+        setGameReadyFlag(false);
+        next(-1);
+        switch (selectLevel) {
+          case 0:
+            easyBgmPlay();
+            break;
+          case 1:
+            normalBgmPlay();
+            break;
+          case 2:
+            hardBgmPlay();
+            break;
+          case 3:
+            expertBgmPlay();
+            break;
+          case 4:
+            secret1BgmPlay();
+            break;
+          case 5:
+            secret2BgmPlay();
+            break;
+          case 6:
+            endlessBgmPlay();
+            break;
+        }
+      }
     }, 2000);
 
     return () => {
@@ -1576,17 +1704,32 @@ const DropBrock = () => {
           if (!secretFlag && selectLevel === 4) {
             setSecretFlag(true);
             setSelectLevel(5);
+            secret1BgmStop();
           } else {
             //ゲームクリア
             setClearStages(
               clearStages.map((item, i) => (i === selectLevel ? true : item))
             );
             setGameClearFlag(true);
+            easyBgmStop();
+            normalBgmStop();
+            hardBgmStop();
+            expertBgmStop();
+            secret1BgmStop();
+            secret2BgmStop();
+            endlessBgmStop();
           }
         } else if (canMove(x, y, rotStatus)) {
           downCheck();
         } else {
           setGameOverFlag(true);
+          easyBgmStop();
+          normalBgmStop();
+          hardBgmStop();
+          expertBgmStop();
+          secret1BgmStop();
+          secret2BgmStop();
+          endlessBgmStop();
         }
       }
     }, 1000);
@@ -1596,71 +1739,81 @@ const DropBrock = () => {
     };
   }, [y, canMove, hp]);
 
+  useEffect(() => {
+    if (gameClearFlag) {
+      gameclearBgmPlay();
+    } else if (gameOverFlag) {
+      gameoverBgmPlay();
+    }
+  }, [gameClearFlag, gameOverFlag]);
+
   return (
-    <Gamepad
-      onA={() => {
-        if (gameStatus === 1) {
+    <div>
+      <Gamepad
+        onA={() => {
+          if (gameStatus === 1) {
+            handleKeyFunction(false, 27);
+          } else {
+            handleKeyFunction(false, 65);
+          }
+        }}
+        onB={() => {
+          if (gameStatus === 0 || gameStatus === 1) {
+            handleKeyFunction(false, 13);
+          } else {
+            handleKeyFunction(false, 68);
+          }
+        }}
+        onX={() => {
+          handleKeyFunction(false, 81);
+        }}
+        onY={() => {
+          handleKeyFunction(false, 81);
+        }}
+        onUp={() => {
+          handleKeyFunction(false, 38);
+        }}
+        onDown={() => {
+          handleKeyFunction(false, 40);
+        }}
+        onLeft={() => {
+          handleKeyFunction(false, 37);
+        }}
+        onRight={() => {
+          handleKeyFunction(false, 39);
+        }}
+        onLB={() => {
+          handleKeyFunction(false, 83);
+        }}
+        onLT={() => {
+          handleKeyFunction(false, 83);
+        }}
+        onRB={() => {
+          handleKeyFunction(false, 83);
+        }}
+        onRT={() => {
+          handleKeyFunction(false, 83);
+        }}
+        onStart={() => {
           handleKeyFunction(false, 27);
-        } else {
-          handleKeyFunction(false, 65);
-        }
-      }}
-      onB={() => {
-        if (gameStatus === 0 || gameStatus === 1) {
-          handleKeyFunction(false, 13);
-        } else {
-          handleKeyFunction(false, 68);
-        }
-      }}
-      onX={() => {
-        handleKeyFunction(false, 81);
-      }}
-      onY={() => {
-        handleKeyFunction(false, 81);
-      }}
-      onUp={() => {
-        handleKeyFunction(false, 38);
-      }}
-      onDown={() => {
-        handleKeyFunction(false, 40);
-      }}
-      onLeft={() => {
-        handleKeyFunction(false, 37);
-      }}
-      onRight={() => {
-        handleKeyFunction(false, 39);
-      }}
-      onLB={() => {
-        handleKeyFunction(false, 83);
-      }}
-      onLT={() => {
-        handleKeyFunction(false, 83);
-      }}
-      onRB={() => {
-        handleKeyFunction(false, 83);
-      }}
-      onRT={() => {
-        handleKeyFunction(false, 83);
-      }}
-      onStart={() => {
-        handleKeyFunction(false, 27);
-      }}
-      onBack={() => {
-        handleKeyFunction(false, 27);
-      }}
-    >
-      <svg
-        width="600"
-        height="600"
-        viewBox="0, 0, 600, 600"
-        xmlns="http://www.w3.org/2000/svg"
-        style={{ backgroundColor: "black" }}
+        }}
+        onBack={() => {
+          handleKeyFunction(false, 27);
+        }}
       >
-        {gameStatus === 0 && <DrawTitle></DrawTitle>}
-        {gameStatus === 1 && <DrawSelect></DrawSelect>}
-        {gameStatus === 2 && <DrawGame></DrawGame>}
-      </svg>
-    </Gamepad>
+        <svg
+          width="600"
+          height="600"
+          viewBox="0, 0, 600, 600"
+          xmlns="http://www.w3.org/2000/svg"
+          style={{ backgroundColor: "black" }}
+        >
+          {gameStatus === 0 && <DrawTitle></DrawTitle>}
+          {gameStatus === 1 && <DrawSelect></DrawSelect>}
+          {gameStatus === 2 && <DrawGame></DrawGame>}
+        </svg>
+      </Gamepad>
+    </div>
   );
 };
 
