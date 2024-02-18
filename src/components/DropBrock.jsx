@@ -787,7 +787,7 @@ const DropBrock = () => {
       setTspinFlag(false);
 
       const attackStatus = attack();
-      const newStatus = setupField(attackStatus, -(atCount === 0 && 1));
+      const newStatus = setupField(attackStatus, y - (atCount === 0 && 1));
       deleteLine(newStatus);
       newBlock(-1);
     }
