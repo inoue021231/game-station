@@ -307,7 +307,7 @@ const DropBrock = () => {
   const [tspinFlag, setTspinFlag] = useState(false);
   const [secretFlag, setSecretFlag] = useState(false);
 
-  const [easyBgmPlay, { stop: easyBgmStop }] = useSound(EASY_BGM, {
+  const [easyBgmPlay, { stop: easyBgmStop, isLoaded }] = useSound(EASY_BGM, {
     loop: true,
   });
   const [normalBgmPlay, { stop: normalBgmStop }] = useSound(NORMAL_BGM, {
@@ -381,7 +381,6 @@ const DropBrock = () => {
     if (gameStatus === 0) {
       if (k === 13) {
         setGameStatus(1);
-        menuBgmPlay();
       }
     } else if (gameStatus === 1) {
       if (selectChara) {
@@ -503,7 +502,6 @@ const DropBrock = () => {
         endlessBgmStop();
         gameclearBgmStop();
         gameoverBgmStop();
-        menuBgmPlay();
       }
     }
 
@@ -1696,6 +1694,13 @@ const DropBrock = () => {
       clearTimeout(timeoutId);
     };
   }, [gameStatus, secretFlag]);
+
+  useEffect(() => {
+    if (gameStatus === 0) {
+    } else if (gameStatus === 1) {
+      menuBgmPlay();
+    }
+  }, [gameStatus]);
 
   useEffect(() => {
     document.addEventListener("keydown", handleKeyFunction);
