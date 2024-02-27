@@ -240,12 +240,12 @@ const DropBrock = () => {
   const COLOR = [
     "darkgray",
     "black",
-    "cyan",
-    "darkviolet",
-    "yellow",
-    "green",
-    "red",
     "blue",
+    "red",
+    "green",
+    "yellow",
+    "darkviolet",
+    "cyan",
     "orange",
     "dimgray",
   ];
@@ -291,9 +291,13 @@ const DropBrock = () => {
   const [hp, setHp] = useState(MAX_HP[selectLevel]);
   const [ren, setRen] = useState(0);
   const [atCount, setAtCount] = useState(ATTACK_COUNT[selectLevel]);
-  const [blockIdx, setBlockIdx] = useState(0);
-  const [holdIdx, setHoldIdx] = useState(-1);
-  const [nextBlock, setNextBlock] = useState([-1, -1, -1]);
+  const [blockIdx, setBlockIdx] = useState({ block: 0, color: 2 });
+  const [holdIdx, setHoldIdx] = useState({ block: -1, color: 2 });
+  const [nextBlock, setNextBlock] = useState([
+    { block: -1, color: 2 },
+    { block: -1, color: 2 },
+    { block: -1, color: 2 },
+  ]);
   const [prevBlock, setPrevBlock] = useState([0, 0, 0, 0, 0, 0, 0]);
 
   const [gameStatus, setGameStatus] = useState(0);
@@ -352,17 +356,17 @@ const DropBrock = () => {
   const [attackSoundPlay, { stop: attackSoundStop }] = useSound(ATTACK_SOUND);
 
   const canMove = (dx, dy, rot) => {
-    const block = BLOCK[blockIdx][rot];
+    const block = BLOCK[blockIdx.block][rot];
     return !block.find((m) => blockStatus[dy + m[1]][dx + m[0]] >= 1);
   };
 
   const hold = () => {
-    if (holdIdx === -1) {
-      setHoldIdx(blockIdx);
-      newBlock(-1);
+    if (holdIdx.block === -1) {
+      setHoldIdx({ block: blockIdx.block, color: blockIdx.color });
+      newBlock();
     } else {
       const tmp = holdIdx;
-      setHoldIdx(blockIdx);
+      setHoldIdx({ block: blockIdx.block, color: blockIdx.color });
       newBlock(tmp);
     }
   };
@@ -530,7 +534,7 @@ const DropBrock = () => {
           const attackStatus = attack();
           const newStatus = setupField(attackStatus, dy - (atCount === 0 && 1));
           deleteLine(newStatus);
-          newBlock(-1);
+          newBlock();
         } else if (k === 40) {
           dy++;
         } else if (k === 65) {
@@ -573,26 +577,25 @@ const DropBrock = () => {
   };
 
   const setupField = (newStatus, dy = 0) => {
-    const block = BLOCK[blockIdx][rotStatus];
+    const block = BLOCK[blockIdx.block][rotStatus];
     let newBlockStatus = [...newStatus];
     block.forEach((m) => {
-      newBlockStatus[dy === 0 ? y + m[1] : dy + m[1]][x + m[0]] = blockIdx + 2;
+      newBlockStatus[dy === 0 ? y + m[1] : dy + m[1]][x + m[0]] =
+        blockIdx.color + 2;
     });
     setBlockStatus(newBlockStatus);
     return newBlockStatus;
   };
 
   const next = (index = 0) => {
-    /* const count = nextBlock.filter((item) => item === -1).length;
-    console.log(nextBlock); */
     if (index === -1) {
-      console.log("first");
       let newPrevBlock = [0, 0, 0, 0, 0, 0, 0];
 
       let firstIndex = Math.floor(Math.random() * 7);
+      const colorIndex = Math.floor(Math.random() * 3);
       newPrevBlock[firstIndex] = 1;
 
-      setBlockIdx(firstIndex);
+      setBlockIdx({ block: firstIndex, color: colorIndex });
 
       const newNextBlock = nextBlock.map(() => {
         let randomIndex;
@@ -603,7 +606,8 @@ const DropBrock = () => {
             break;
           }
         }
-        return randomIndex;
+        const nextColorIndex = Math.floor(Math.random() * 3);
+        return { block: randomIndex, color: nextColorIndex };
       });
       setNextBlock(newNextBlock);
       setPrevBlock(newPrevBlock);
@@ -621,8 +625,13 @@ const DropBrock = () => {
           break;
         }
       }
-      setBlockIdx(nextBlock[0]);
-      setNextBlock([nextBlock[1], nextBlock[2], randomIndex]);
+      const nextColorIndex = Math.floor(Math.random() * 3);
+      setBlockIdx({ block: nextBlock[0].block, color: nextBlock[0].color });
+      setNextBlock([
+        { block: nextBlock[1].block, color: nextBlock[1].color },
+        { block: nextBlock[2].block, color: nextBlock[2].color },
+        { block: randomIndex, color: nextColorIndex },
+      ]);
       setPrevBlock(newPrevBlock);
     }
   };
@@ -671,9 +680,22 @@ const DropBrock = () => {
     let lineCount = 0;
     let damage = 0;
     let perfectFlag = true;
+
+    const allEqual = (arr) => {
+      const referenceValue = arr[0];
+      if (arr[0] <= 1) {
+        return false;
+      }
+      return arr.every((value) => value === referenceValue);
+    };
+
     newBlockStatus.forEach((items, i) => {
       const modelArray = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1];
       let count = items.filter((item) => item >= 1).length;
+      const is1color = allEqual(items.slice(1, FIELD_WIDTH - 1));
+      if (is1color) {
+        damage += 3;
+      }
       if (count === FIELD_WIDTH && i !== FIELD_HEIGHT - 1) {
         newBlockStatus.splice(i, 1);
         newBlockStatus.splice(0, 0, [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
@@ -765,15 +787,15 @@ const DropBrock = () => {
     return newBlockStatus;
   };
 
-  const newBlock = (index) => {
+  const newBlock = (index = -1) => {
     setX(4);
     setY(0);
     setRotStatus(0);
     if (index === -1) {
-      setBlockIdx(nextBlock[0]);
+      setBlockIdx({ block: nextBlock[0].block, color: nextBlock[0].color });
       next();
     } else {
-      setBlockIdx(index);
+      setBlockIdx({ block: index.block, color: index.color });
     }
   };
 
@@ -787,7 +809,7 @@ const DropBrock = () => {
       const attackStatus = attack();
       const newStatus = setupField(attackStatus, y - (atCount === 0 && 1));
       deleteLine(newStatus);
-      newBlock(-1);
+      newBlock();
     }
   };
 
@@ -816,8 +838,8 @@ const DropBrock = () => {
   };
 
   const DrawBlock = () => {
-    const block = BLOCK[blockIdx][rotStatus];
-    const col = COLOR[blockIdx + 2];
+    const block = BLOCK[blockIdx.block][rotStatus];
+    const col = COLOR[blockIdx.color + 2];
     return (
       <g>
         {block.map((m, i) => {
@@ -840,8 +862,8 @@ const DropBrock = () => {
   };
 
   const DrawForecast = () => {
-    const block = BLOCK[blockIdx][rotStatus];
-    const col = COLOR[blockIdx + 2];
+    const block = BLOCK[blockIdx.block][rotStatus];
+    const col = COLOR[blockIdx.color + 2];
     let dy = y;
     while (canMove(x, dy, rotStatus)) {
       dy++;
@@ -872,7 +894,7 @@ const DropBrock = () => {
   const DrawNext = () => {
     const dx = 1.5;
     const dy = 2.5;
-    const flag = nextBlock.find((item) => item === -1);
+    const flag = nextBlock.find((item) => item.block === -1);
     const smallBlockSize = (BLOCK_SIZE * 2) / 3;
     return (
       <g>
@@ -894,12 +916,12 @@ const DropBrock = () => {
         </text>
         {!flag &&
           nextBlock.map((index, i) => {
-            const block = BLOCK[index][0];
-            const col = COLOR[index + 2];
+            const block = BLOCK[index.block][0];
+            const col = COLOR[index.color + 2];
 
             return block.map((m, j) => {
               const x1 =
-                index === 2 || index === 0
+                index.block === 2 || index.block === 0
                   ? (dx + m[0] - 0.5) * smallBlockSize + X0 + canvasWidth + 5
                   : (dx + m[0]) * smallBlockSize + X0 + canvasWidth + 5;
               const y1 = (dy + m[1]) * smallBlockSize + Y0 + i * BLOCK_SIZE * 4;
@@ -942,10 +964,10 @@ const DropBrock = () => {
         >
           HOLD
         </text>
-        {holdIdx !== -1 &&
-          BLOCK[holdIdx][0].map((m, i) => {
+        {holdIdx.block !== -1 &&
+          BLOCK[holdIdx.block][0].map((m, i) => {
             const x1 =
-              holdIdx === 2 || holdIdx === 0
+              holdIdx.block === 2 || holdIdx.block === 0
                 ? (dx + m[0] - 0.5) * smallBlockSize + X0 - BLOCK_SIZE * 5 - 5
                 : (dx + m[0]) * smallBlockSize + X0 - BLOCK_SIZE * 5 - 5;
             const y1 = (dy + m[1]) * smallBlockSize + Y0 - 5;
@@ -956,7 +978,7 @@ const DropBrock = () => {
                 width={smallBlockSize}
                 height={smallBlockSize}
                 stroke="white"
-                fill={COLOR[holdIdx + 2]}
+                fill={COLOR[holdIdx.color + 2]}
                 key={`hold${i}`}
               ></rect>
             );
@@ -1624,9 +1646,13 @@ const DropBrock = () => {
       setHp(MAX_HP[selectLevel]);
       setRen(0);
       setAtCount(ATTACK_COUNT[selectLevel]);
-      setBlockIdx(0);
-      setHoldIdx(-1);
-      setNextBlock([-1, -1, -1]);
+      setBlockIdx({ block: 0, color: 2 });
+      setHoldIdx({ block: -1, color: 2 });
+      setNextBlock([
+        { block: -1, color: 2 },
+        { block: -1, color: 2 },
+        { block: -1, color: 2 },
+      ]);
       setPrevBlock([0, 0, 0, 0, 0, 0, 0]);
       setGameOverFlag(false);
       setGameClearFlag(false);
