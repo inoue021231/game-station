@@ -629,10 +629,38 @@ const DropBrock = () => {
             setTspinFlag(true);
             tspinSoundPlay();
           }
+          // sspin left
+        } else if (blockIdx.block === 3 && rotStatus === 3 && rot === 2) {
+          if (
+            blockStatus[y + 1][x - 1] >= 1 &&
+            blockStatus[y + 1][x + 2] >= 1 &&
+            canMove(x - 1, y + 2, rot)
+          ) {
+            dx -= 1;
+            dy += 2;
+          }
+          // sspin right
+        } else if (blockIdx.block === 3 && rotStatus === 1 && rot === 2) {
+          if (blockStatus[y + 2][x] >= 1 && canMove(x, y + 2, rot)) {
+            dy += 2;
+          }
+          // zspin left
+        } else if (blockIdx.block === 4 && rotStatus === 3 && rot === 2) {
+          if (blockStatus[y + 2][x + 1] >= 1 && canMove(x - 1, y + 2, rot)) {
+            dx -= 1;
+            dy += 2;
+          }
+          // zspin right
+        } else if (blockIdx.block === 4 && rotStatus === 1 && rot === 2) {
+          if (
+            blockStatus[y + 1][x - 1] >= 1 &&
+            blockStatus[y + 1][x + 2] >= 1 &&
+            canMove(x, y + 2, rot)
+          ) {
+            dy += 2;
+          }
         }
       }
-
-      // tspin
 
       if (canMove(dx, dy, rot)) {
         setX(dx);
