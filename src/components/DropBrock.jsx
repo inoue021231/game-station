@@ -561,13 +561,13 @@ const DropBrock = () => {
           skillSoundPlay();
         }
 
-        // tspin triple
         if (
           blockIdx.block === 1 &&
           rotStatus === 0 &&
           blockStatus[y + 2][x + 1] >= 1 &&
           spinFlag
         ) {
+          // tspin triple
           if (rot === 1) {
             if (blockStatus[y][x] >= 1 && canMove(x - 1, y + 2, rot)) {
               dx -= 1;
@@ -583,8 +583,8 @@ const DropBrock = () => {
               tspinSoundPlay();
             }
           }
-          // tspin double
         } else if (blockIdx.block === 1 && canMove(dx, dy, rot)) {
+          // tspin double
           let count = 0;
           if (blockStatus[y][x] >= 1) count++;
           if (blockStatus[y + 2][x] >= 1) count++;
@@ -595,13 +595,13 @@ const DropBrock = () => {
             setTspinFlag(true);
             tspinSoundPlay();
           }
-          // tspin single left
         } else if (
           blockIdx.block === 1 &&
           rotStatus === 1 &&
           rot === 0 &&
           !canMove(x, y, rot)
         ) {
+          // tspin single left
           if (
             blockStatus[y + 2][x + 2] === 0 &&
             blockStatus[y + 2][x + 3] === 0 &&
@@ -612,13 +612,13 @@ const DropBrock = () => {
             setTspinFlag(true);
             tspinSoundPlay();
           }
-          // tspin single right
         } else if (
           blockIdx.block === 1 &&
           rotStatus === 3 &&
           rot === 0 &&
           !canMove(x, y, rot)
         ) {
+          // tspin single right
           if (
             blockStatus[y + 2][x - 1] === 0 &&
             blockStatus[y + 2][x] === 0 &&
@@ -629,8 +629,8 @@ const DropBrock = () => {
             setTspinFlag(true);
             tspinSoundPlay();
           }
-          // sspin left
         } else if (blockIdx.block === 3 && rotStatus === 3 && rot === 2) {
+          // sspin left
           if (
             blockStatus[y + 1][x - 1] >= 1 &&
             blockStatus[y + 1][x + 2] >= 1 &&
@@ -639,19 +639,19 @@ const DropBrock = () => {
             dx -= 1;
             dy += 2;
           }
-          // sspin right
         } else if (blockIdx.block === 3 && rotStatus === 1 && rot === 2) {
+          // sspin right
           if (blockStatus[y + 2][x] >= 1 && canMove(x, y + 2, rot)) {
             dy += 2;
           }
-          // zspin left
         } else if (blockIdx.block === 4 && rotStatus === 3 && rot === 2) {
+          // zspin left
           if (blockStatus[y + 2][x + 1] >= 1 && canMove(x - 1, y + 2, rot)) {
             dx -= 1;
             dy += 2;
           }
-          // zspin right
         } else if (blockIdx.block === 4 && rotStatus === 1 && rot === 2) {
+          // zspin right
           if (
             blockStatus[y + 1][x - 1] >= 1 &&
             blockStatus[y + 1][x + 2] >= 1 &&
@@ -659,6 +659,28 @@ const DropBrock = () => {
           ) {
             dy += 2;
           }
+        } else if (blockIdx.block === 5 && rotStatus === 1 && rot === 0) {
+          // jspin left
+          if (
+            blockStatus[y + 1][x + 1] >= 1 &&
+            blockStatus[y + 1][x + 2] >= 1 &&
+            canMove(x, y + 1, rot)
+          ) {
+            dy += 1;
+          }
+        } else if (blockIdx.block === 6 && rotStatus === 3 && rot === 0) {
+          // lspin right
+          if (
+            blockStatus[y + 1][x - 1] >= 1 &&
+            blockStatus[y + 1][x] >= 1 &&
+            canMove(x - 1, y + 1, rot)
+          ) {
+            dx -= 1;
+            dy += 1;
+          }
+        } else if (!canMove(x, y, rot)) {
+          // 回転時めり込み防止
+          dy -= 1;
         }
       }
 
