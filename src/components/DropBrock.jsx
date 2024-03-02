@@ -377,6 +377,7 @@ const DropBrock = () => {
     let dx = 4;
     let dy = 0;
     let rot = 0;
+    let spinFlag = true;
 
     if (k === 13 && gameStatus !== 2) {
       selectSoundPlay();
@@ -516,7 +517,7 @@ const DropBrock = () => {
     }
 
     if (gameStatus === 2) {
-      if (!gameOverFlag && !gameReadyFlag && !gameClearFlag) {
+      if (!gameOverFlag && !gameReadyFlag && !gameClearFlag && hp > 0) {
         if (k === 37) {
           dx--;
         } else if (k === 39) {
@@ -535,6 +536,7 @@ const DropBrock = () => {
           const newStatus = setupField(attackStatus, dy - (atCount === 0 && 1));
           deleteLine(newStatus);
           newBlock();
+          spinFlag = false;
         } else if (k === 40) {
           dy++;
         } else if (k === 65) {
@@ -551,11 +553,82 @@ const DropBrock = () => {
             dy = 0;
             rot = 0;
             holdSoundPlay();
+            spinFlag = false;
           }
         } else if (k === 81 && skillCount === 0) {
           skill();
           setSkillCount(5);
           skillSoundPlay();
+        }
+
+        // tspin triple
+        if (
+          blockIdx.block === 1 &&
+          rotStatus === 0 &&
+          blockStatus[y + 2][x + 1] >= 1 &&
+          spinFlag
+        ) {
+          if (rot === 1) {
+            if (blockStatus[y][x] >= 1 && canMove(x - 1, y + 2, rot)) {
+              dx -= 1;
+              dy += 2;
+              setTspinFlag(true);
+              tspinSoundPlay();
+            }
+          } else if (rot === 3) {
+            if (blockStatus[y][x + 2] >= 1 && canMove(x + 1, y + 2, rot)) {
+              dx += 1;
+              dy += 2;
+              setTspinFlag(true);
+              tspinSoundPlay();
+            }
+          }
+          // tspin double
+        } else if (blockIdx.block === 1 && canMove(dx, dy, rot)) {
+          let count = 0;
+          if (blockStatus[y][x] >= 1) count++;
+          if (blockStatus[y + 2][x] >= 1) count++;
+          if (blockStatus[y][x + 2] >= 1) count++;
+          if (blockStatus[y + 2][x + 2] >= 1) count++;
+
+          if (count >= 3) {
+            setTspinFlag(true);
+            tspinSoundPlay();
+          }
+          // tspin single left
+        } else if (
+          blockIdx.block === 1 &&
+          rotStatus === 1 &&
+          rot === 0 &&
+          !canMove(x, y, rot)
+        ) {
+          if (
+            blockStatus[y + 2][x + 2] === 0 &&
+            blockStatus[y + 2][x + 3] === 0 &&
+            blockStatus[y + 1][x + 3] >= 1
+          ) {
+            dx += 1;
+            dy += 1;
+            setTspinFlag(true);
+            tspinSoundPlay();
+          }
+          // tspin single right
+        } else if (
+          blockIdx.block === 1 &&
+          rotStatus === 3 &&
+          rot === 0 &&
+          !canMove(x, y, rot)
+        ) {
+          if (
+            blockStatus[y + 2][x - 1] === 0 &&
+            blockStatus[y + 2][x] === 0 &&
+            blockStatus[y + 1][x - 1] >= 1
+          ) {
+            dx -= 1;
+            dy += 1;
+            setTspinFlag(true);
+            tspinSoundPlay();
+          }
         }
       }
 
@@ -568,7 +641,11 @@ const DropBrock = () => {
         if (
           ((k >= 37 && k <= 40) || k == 65 || k == 68) &&
           k != 38 &&
-          k != 83
+          k != 83 &&
+          !gameClearFlag &&
+          !gameOverFlag &&
+          !gameReadyFlag &&
+          hp > 0
         ) {
           moveSoundPlay();
         }
