@@ -1,0 +1,18 @@
+@use "./../color" as color;
+
+body {
+  background-color: color.$bg;
+  user-select: none;
+}
+
+.container {
+  background-color: color.$content-bg;
+  display: flex;
+  justify-content: space-around;
+  margin: 0 5%;
+}
+
+.box {
+  border: 2px solid color.$border;
+  width: 100%;
+}
