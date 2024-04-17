@@ -27,7 +27,7 @@ const Home = () => {
             alt="落ち物パズルゲーム"
           ></img>
         </div>
-        <div>
+        {/* <div>
           <img
             className="box"
             src={DROP_BLOCK_THUMBNAIL}
@@ -40,7 +40,7 @@ const Home = () => {
             src={DROP_BLOCK_THUMBNAIL}
             alt="Coming soon..."
           ></img>
-        </div>
+        </div> */}
       </div>
     </div>
   );
