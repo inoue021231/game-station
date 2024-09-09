@@ -1,8 +1,51 @@
 @use "./../color" as color;
 
+$star-count: 1000;
+
+@function random-opacity() {
+  @return calc((random(5) + 5) / 10);
+}
+
+@function random-px() {
+  @return calc((random(10) / 10 + 0.5)) + px;
+}
+
+@function random-pos() {
+  @return random(100) + "% " + random(100) + "%";
+}
+
+@function star-gradient() {
+  $pos: random-pos();
+  $size: random-px();
+  $opacity: random-opacity();
+  @return radial-gradient(
+    circle at #{$pos},
+    rgba(255, 255, 255, $opacity) #{$size},
+    transparent #{$size}
+  );
+}
+
+@mixin starry-background {
+  $gradients: ();
+
+  @for $i from 1 through $star-count {
+    $gradients: append($gradients, star-gradient(), comma);
+  }
+
+  background-image: $gradients;
+}
+
 body {
   background-color: color.$bg;
   user-select: none;
+  position: relative;
+  overflow: hidden;
+
+  @include starry-background;
+
+  background-size: 200% 200%;
+  background-repeat: no-repeat;
+  background-position: 0 0;
 }
 
 .container {
@@ -10,9 +53,13 @@ body {
   display: flex;
   justify-content: space-around;
   margin: 0 5%;
+  position: relative;
+  z-index: 2;
 }
 
 .box img {
   border: 2px solid color.$border;
   width: 100%;
+  transition: filter 0.3s ease;
+  z-index: 2;
 }
