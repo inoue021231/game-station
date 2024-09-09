@@ -1,9 +1,9 @@
-import DropBlockPage from "./pages/DropBlockPage";
 import "./app.css";
 import Home from "./pages/Home";
+import DropBlockPage from "./pages/DropBlockPage";
+import MineSweeperPage from "./pages/MineSweeperPage";
+import BlockBreakerPage from "./pages/BlockBreakerPage";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import MineSweeper from "./components/MineSweeper/MineSweeper";
-import BlockBreaker from "./components/BlockBreaker/BlockBreaker";
 
 const App = () => {
   return (
@@ -11,8 +11,8 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/game/dropblock" element={<DropBlockPage />} />
-        <Route path="/game/minesweeper" element={<MineSweeper />} />
-        <Route path="/game/blockbreaker" element={<BlockBreaker />} />
+        <Route path="/game/minesweeper" element={<MineSweeperPage />} />
+        <Route path="/game/blockbreaker" element={<BlockBreakerPage />} />
       </Routes>
     </BrowserRouter>
   );

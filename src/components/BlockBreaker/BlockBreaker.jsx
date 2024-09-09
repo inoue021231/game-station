@@ -1,5 +1,5 @@
 const BlockBreaker = () => {
-  return <div>Block Breaker</div>;
+  return <div style={{ color: "white" }}>Block Breaker</div>;
 };
 
 export default BlockBreaker;

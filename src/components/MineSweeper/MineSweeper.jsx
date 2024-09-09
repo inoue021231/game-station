@@ -1,5 +1,5 @@
 const MineSweeper = () => {
-  return <div>Mine Sweeper</div>;
+  return <div style={{ color: "white" }}>Mine Sweeper</div>;
 };
 
 export default MineSweeper;

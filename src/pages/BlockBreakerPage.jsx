@@ -1,19 +1,19 @@
-import DropBlock from "../components/DropBlock/DropBlock";
+import BlockBreaker from "../components/BlockBreaker/BlockBreaker";
 import Header from "../components/Header";
 
 import styles from "./page.module.scss";
 
-const DropBlockPage = () => {
+const BlockBreakerPage = () => {
   return (
     <div>
       <Header></Header>
       <div className={styles.container}>
         <div className={styles.box}>
-          <DropBlock />
+          <BlockBreaker />
         </div>
       </div>
     </div>
   );
 };
 
-export default DropBlockPage;
+export default BlockBreakerPage;
