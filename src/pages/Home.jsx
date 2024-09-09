@@ -1,9 +1,9 @@
 import Header from "../components/Header";
-import "./Home.scss";
+import styles from "./home.module.scss";
 import { useNavigate } from "react-router-dom";
 
 import DROP_BLOCK_THUMBNAIL from "./../assets/thumbnails/drop_block_thumbnail.png";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const Home = () => {
   const [dropblockStatus, setDropBlockStatus] = useState(false);
@@ -13,10 +13,9 @@ const Home = () => {
   return (
     <div>
       <Header></Header>
-      <div className="container">
-        <div>
+      <div className={styles.container}>
+        <div className={styles.box}>
           <img
-            className="box"
             src={DROP_BLOCK_THUMBNAIL}
             onClick={() => navigate("/game/dropbrock")}
             onMouseEnter={() => setDropBlockStatus(true)}
@@ -27,20 +26,12 @@ const Home = () => {
             alt="落ち物パズルゲーム"
           ></img>
         </div>
-        {/* <div>
-          <img
-            className="box"
-            src={DROP_BLOCK_THUMBNAIL}
-            alt="Coming soon..."
-          ></img>
+        <div className={styles.box}>
+          <img src={DROP_BLOCK_THUMBNAIL} alt="Coming soon..."></img>
         </div>
-        <div>
-          <img
-            className="box"
-            src={DROP_BLOCK_THUMBNAIL}
-            alt="Coming soon..."
-          ></img>
-        </div> */}
+        <div className={styles.box}>
+          <img src={DROP_BLOCK_THUMBNAIL} alt="Coming soon..."></img>
+        </div>
       </div>
     </div>
   );

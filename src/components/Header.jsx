@@ -1,8 +1,9 @@
-import "./header.scss";
+import styles from "./header.module.scss";
+
 const Header = () => {
   return (
-    <div className="typing">
-      <div className="typing-effect">Game Station</div>
+    <div className={styles.typing}>
+      <div className={styles.typingEffect}>Game Station</div>
     </div>
   );
 };
