@@ -2,40 +2,40 @@ import { useState, useEffect } from "react";
 import Gamepad from "react-gamepad";
 import useSound from "use-sound";
 
-import CLEAR_MARK from "./../assets/crown.png";
-import EASY_ENEMY from "./../assets/slime.png";
-import NORMAL_ENEMY from "./../assets/mummy.png";
-import HARD_ENEMY from "./../assets/devil.png";
-import EXPERT_ENEMY from "./../assets/shinigami.png";
-import SECRET1_ENEMY from "./../assets/mao.png";
-import SECRET2_ENEMY from "./../assets/dragon.png";
-import ENDLESS_ENEMY from "./../assets/heishi.png";
-import CHARA_YUSHA from "./../assets/yusha.png";
-import CHARA_SENSHI from "./../assets/senshi.png";
-import CHARA_MAHOTSUKAI from "./../assets/mahotsukai.png";
+import CLEAR_MARK from "./../../assets/crown.png";
+import EASY_ENEMY from "./../../assets/slime.png";
+import NORMAL_ENEMY from "./../../assets/mummy.png";
+import HARD_ENEMY from "./../../assets/devil.png";
+import EXPERT_ENEMY from "./../../assets/shinigami.png";
+import SECRET1_ENEMY from "./../../assets/mao.png";
+import SECRET2_ENEMY from "./../../assets/dragon.png";
+import ENDLESS_ENEMY from "./../../assets/heishi.png";
+import CHARA_YUSHA from "./../../assets/yusha.png";
+import CHARA_SENSHI from "./../../assets/senshi.png";
+import CHARA_MAHOTSUKAI from "./../../assets/mahotsukai.png";
 
-import EASY_BGM from "./../assets/easy.mp3";
-import NORMAL_BGM from "./../assets/normal.mp3";
-import HARD_BGM from "./../assets/hard.mp3";
-import EXPERT_BGM from "./../assets/expert.mp3";
-import SECRET1_BGM from "./../assets/secret1.mp3";
-import SECRET2_BGM from "./../assets/secret2.mp3";
-import ENDLESS_BGM from "./../assets/endless.mp3";
-import MENU_BGM from "./../assets/menu.mp3";
-import GAMECLEAR_BGM from "./../assets/gameclear.mp3";
-import GAMEOVER_BGM from "./../assets/gameover.mp3";
+import EASY_BGM from "./../../assets/easy.mp3";
+import NORMAL_BGM from "./../../assets/normal.mp3";
+import HARD_BGM from "./../../assets/hard.mp3";
+import EXPERT_BGM from "./../../assets/expert.mp3";
+import SECRET1_BGM from "./../../assets/secret1.mp3";
+import SECRET2_BGM from "./../../assets/secret2.mp3";
+import ENDLESS_BGM from "./../../assets/endless.mp3";
+import MENU_BGM from "./../../assets/menu.mp3";
+import GAMECLEAR_BGM from "./../../assets/gameclear.mp3";
+import GAMEOVER_BGM from "./../../assets/gameover.mp3";
 
-import CANCEL_SOUND from "./../assets/cancel.mp3";
-import DAMAGE_SOUND from "./../assets/damage.mp3";
-import HOLD_SOUND from "./../assets/hold.mp3";
-import MOVE_SOUND from "./../assets/move.mp3";
-import SELECT_SOUND from "./../assets/select.mp3";
-import SKILL_SOUND from "./../assets/skill.mp3";
-import TSPIN_SOUND from "./../assets/tspin.mp3";
-import UP_SOUND from "./../assets/up.mp3";
-import ATTACK_SOUND from "./../assets/attack.mp3";
+import CANCEL_SOUND from "./../../assets/cancel.mp3";
+import DAMAGE_SOUND from "./../../assets/damage.mp3";
+import HOLD_SOUND from "./../../assets/hold.mp3";
+import MOVE_SOUND from "./../../assets/move.mp3";
+import SELECT_SOUND from "./../../assets/select.mp3";
+import SKILL_SOUND from "./../../assets/skill.mp3";
+import TSPIN_SOUND from "./../../assets/tspin.mp3";
+import UP_SOUND from "./../../assets/up.mp3";
+import ATTACK_SOUND from "./../../assets/attack.mp3";
 
-const DropBrock = () => {
+const DropBlock = () => {
   const FIELD_WIDTH = 12;
   const FIELD_HEIGHT = 23;
   const BLOCK_SIZE = 15;
@@ -1982,4 +1982,4 @@ const DropBrock = () => {
   );
 };
 
-export default DropBrock;
+export default DropBlock;
