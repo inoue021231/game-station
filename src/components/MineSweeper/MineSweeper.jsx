@@ -121,7 +121,7 @@ const MineSweeper = () => {
     }
     if (event.button === 2) {
       const buffField = [...field];
-      buffField[y][x] = 2;
+      buffField[y][x] = buffField[y][x] === 1 ? 2 : 1;
       setField(buffField);
     } else {
       const buffField = [...field];
@@ -149,6 +149,7 @@ const MineSweeper = () => {
                     transform={`translate(${x * BLOCK_SIZE}, ${
                       y * BLOCK_SIZE
                     })`}
+                    style={{ cursor: "pointer" }}
                     key={`${y}-${x}`}
                   >
                     {field[y][x] ? (
