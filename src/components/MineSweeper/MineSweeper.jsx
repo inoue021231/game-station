@@ -5,43 +5,52 @@ const MineSweeper = () => {
   const FIELD_HEIGHT = 10;
   const BLOCK_SIZE = 60;
   const MINE_COUNT = 20;
-  const COLOR = [
-    "darkgray",
-    "black",
-    "blue", //1
-    "red", //3
-    "green", //2
-    "yellow",
-    "darkviolet",
-    "cyan",
-    "orange",
-    "dimgray",
-  ];
 
   const [field, setField] = useState(
     [...Array(FIELD_HEIGHT).keys()].map(() => {
-      return [...Array(FIELD_HEIGHT).keys()].map(() => {
-        return 1;
+      return [...Array(FIELD_WIDTH).keys()].map(() => {
+        return 1; // 1 = 未開封
       });
     })
   );
 
   const [mineField, setMineField] = useState(
     [...Array(FIELD_HEIGHT).keys()].map(() => {
-      return [...Array(FIELD_HEIGHT).keys()].map(() => {
-        return 0;
+      return [...Array(FIELD_WIDTH).keys()].map(() => {
+        return 0; // 0 = 地雷なし
       });
     })
   );
 
   const [initialFlag, setInitialFlag] = useState(true);
 
+  const checkEmptyField = (x, y, newField) => {
+    if (x < 0 || x >= FIELD_WIDTH || y < 0 || y >= FIELD_HEIGHT) return;
+    if (newField[y][x] !== 1) return; // 既に開いているマス
+    if (mineField[y][x] !== 0) return; // 地雷があるマス
+
+    // 開けるマスをリストに追加
+    newField[y][x] = 0;
+
+    // 8方向を再帰的にチェック
+    checkEmptyField(x - 1, y - 1, newField);
+    checkEmptyField(x, y - 1, newField);
+    checkEmptyField(x + 1, y - 1, newField);
+    checkEmptyField(x + 1, y, newField);
+    checkEmptyField(x + 1, y + 1, newField);
+    checkEmptyField(x, y + 1, newField);
+    checkEmptyField(x - 1, y + 1, newField);
+    checkEmptyField(x - 1, y, newField);
+  };
+
   const handleFieldClick = (event, x, y) => {
     if (initialFlag) {
       if (event.button === 2) return;
+
       const buffField = [...field];
-      buffField[y][x] = 0;
       const buffMineField = [...mineField];
+
+      // 地雷の配置
       for (let i = 0; i < MINE_COUNT; i++) {
         while (true) {
           const newMineX = Math.floor(Math.random() * FIELD_WIDTH);
@@ -51,82 +60,53 @@ const MineSweeper = () => {
             buffMineField[newMineY][newMineX] === 0
           ) {
             buffMineField[newMineY][newMineX] = -1;
-            // 左上
-            if (
-              newMineX !== 0 &&
-              newMineY !== 0 &&
-              buffMineField[newMineY - 1][newMineX - 1] !== -1
-            ) {
-              buffMineField[newMineY - 1][newMineX - 1]++;
-            }
-            // 上
-            if (
-              newMineY !== 0 &&
-              buffMineField[newMineY - 1][newMineX] !== -1
-            ) {
-              buffMineField[newMineY - 1][newMineX]++;
-            }
-            // 右上
-            if (
-              newMineX !== FIELD_WIDTH - 1 &&
-              newMineY !== 0 &&
-              buffMineField[newMineY - 1][newMineX + 1] !== -1
-            ) {
-              buffMineField[newMineY - 1][newMineX + 1]++;
-            }
-            // 右
-            if (
-              newMineX !== FIELD_WIDTH - 1 &&
-              buffMineField[newMineY][newMineX + 1] !== -1
-            ) {
-              buffMineField[newMineY][newMineX + 1]++;
-            }
-            // 右下
-            if (
-              newMineX !== FIELD_WIDTH - 1 &&
-              newMineY !== FIELD_HEIGHT - 1 &&
-              buffMineField[newMineY + 1][newMineX + 1] !== -1
-            ) {
-              buffMineField[newMineY + 1][newMineX + 1]++;
-            }
-            // 下
-            if (
-              newMineY !== FIELD_HEIGHT - 1 &&
-              buffMineField[newMineY + 1][newMineX] !== -1
-            ) {
-              buffMineField[newMineY + 1][newMineX]++;
-            }
-            // 左下
-            if (
-              newMineX !== 0 &&
-              newMineY !== FIELD_HEIGHT - 1 &&
-              buffMineField[newMineY + 1][newMineX - 1] !== -1
-            ) {
-              buffMineField[newMineY + 1][newMineX - 1]++;
-            }
-            // 左
-            if (
-              newMineX !== 0 &&
-              buffMineField[newMineY][newMineX - 1] !== -1
-            ) {
-              buffMineField[newMineY][newMineX - 1]++;
+
+            // 8方向の地雷数カウント
+            for (let i = -1; i <= 1; i++) {
+              for (let j = -1; j <= 1; j++) {
+                if (i === 0 && j === 0) continue;
+                const nx = newMineX + i;
+                const ny = newMineY + j;
+                if (
+                  nx >= 0 &&
+                  nx < FIELD_WIDTH &&
+                  ny >= 0 &&
+                  ny < FIELD_HEIGHT &&
+                  buffMineField[ny][nx] !== -1
+                ) {
+                  buffMineField[ny][nx]++;
+                }
+              }
             }
             break;
           }
         }
       }
+
       setInitialFlag(false);
-      setField(buffField);
       setMineField(buffMineField);
-    }
-    if (event.button === 2) {
-      const buffField = [...field];
-      buffField[y][x] = buffField[y][x] === 1 ? 2 : 1;
-      setField(buffField);
+
+      // 初回クリック時に周囲を開ける
+      if (buffMineField[y][x] === 0) {
+        const newField = [...field];
+        checkEmptyField(x, y, newField);
+        setField(newField);
+      } else {
+        buffField[y][x] = 0;
+        setField(buffField);
+      }
     } else {
-      const buffField = [...field];
-      buffField[y][x] = 0;
-      setField(buffField);
+      if (event.button === 2) {
+        const buffField = [...field];
+        buffField[y][x] = buffField[y][x] === 1 ? 2 : 1;
+        setField(buffField);
+      } else {
+        const buffField = [...field];
+        buffField[y][x] = 0;
+        const newField = [...buffField];
+        checkEmptyField(x, y, newField);
+        setField(newField);
+      }
     }
   };
 
@@ -189,7 +169,7 @@ const MineSweeper = () => {
                           fill={mineField[y][x] !== -1 ? "lightgray" : "red"}
                         ></rect>
                         <g
-                          transform={`translate(${BLOCK_SIZE / 2},${
+                          transform={`translate(${BLOCK_SIZE / 2}, ${
                             BLOCK_SIZE / 2
                           })`}
                           textAnchor="middle"
